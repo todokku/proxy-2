@@ -1,0 +1,35 @@
+extends layout
+
+
+
+block content
+
+  - var time = 10
+  
+  if type == 'error'
+    h1 参数<font color="red">wx</font>必须
+  else if type == 'timeout'
+    h1 当前抓完一轮了，让我们休息<font color='red'>#{Math.floor(timeout/1000/60)}分#{Math.floor(timeout/1000%60)}秒</font>哦
+  else if type == 'nothing'
+    h1 当前微信号(编号 wx = #{wx})<font color="red">无数据</font>哦， 我会#{time}秒刷新一次哦
+  else if type = 'canNext'
+    h1 准备就绪！
+    p #{time}秒后将自动进入抓取流程
+
+
+  script.
+    var type = '#{type}'
+    var wx = #{wx}
+    var exact = #{exact}
+    var timeout = #{timeout}
+    if (type == 'timeout') {
+      setTimeout(() => location.href='/readlike/?&action=nothing&wx=#{wx}', timeout)
+    }
+    if (type == 'nothing') {
+      setTimeout(() => location.href='/readlike/?&action=nothing&wx=#{wx}', #{time}*1000)
+    }
+    if (type == 'canNext') setTimeout(() => location.href='http://mp.weixin.qq.com/s?__biz=MzA3NTEzMTUwNA==&mid=2651081567&idx=1&sn=a1c252116b68189791f82d366be9f4f8&chksm=8485d440b3f25d56a7c441dbcc1150acd6b60ad6a3f8f6e8ac3ea0fc340b25bffbc90e281bb8&type=24&wx=#{wx}&type={exact}', #{time}*1000);
+    
+    
+
+     

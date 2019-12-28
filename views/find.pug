@@ -1,0 +1,43 @@
+extends layout
+
+block content
+
+
+  - var time = 10
+  - var t = 3600
+
+  if type == 'error'
+    h1 参数<font color="red">wx</font>必须
+  else if type == 'timeout'
+    h1 抓完一轮了，休息#{ t/60 }分钟
+    p 倒计时： <font color="red" id="time"></font>
+  else if type == 'nothing'
+    h1 当前微信号(编号 wx = #{wx})<font color="red">无数据</font>哦， 我会#{time}秒刷新一次哦
+  else if type == 'canNext'
+    h1 准备就绪！
+    p #{time}秒后将自动进入抓取流程
+
+
+  script.
+    var type = '#{type}'
+    var wx = #{wx}
+    if (type == 'timeout') {
+      var time = document.querySelector('#time')
+      var t = #{t}
+      var timer = setInterval(() => {
+          if (t <= 0) {
+              clearInterval(timer)
+              location.href='/find?action=nothing&wx=#{wx}'
+          }
+          t -= 1
+          time.innerHTML = Math.floor(t/60) + '分'  + Math.floor(t%60) + '秒'
+      }, 1000)
+    }
+
+    if (type == 'nothing') {
+      setTimeout(() => location.href='/find?action=nothing&wx=#{wx}', #{time}*1000)
+    }
+    
+    if (type == 'canNext') setTimeout(() => location.href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=#{ nextLink.biz }&scene=124&searchwx=#{ wx }#wechat_redirect', #{time}*1000)
+
+    

@@ -1,0 +1,6 @@
+
+http://127.0.0.1/find?wx=1  // 首页
+
+http://127.0.0.1/readlike?wx=1 // 阅读数
+
+http://127.0.0.1/readlike?exact=1&wx=1 // 24小时阅读数

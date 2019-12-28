@@ -1,0 +1,10 @@
+extends layout
+
+block content
+
+  if error
+    h1 参数错误！请确保带参： <font color='red'>total: 登录的微信个数</font>、<font color='red'>machine: 登录的机器</font>
+    p 可选的参数： <font color='#f60'>exact: 是否是24小时抓文</font>
+  else
+    h1 初始化完成！请访问对应的链接获取相应的数据。
+    p 当前机器编码 machine = <font color='red'><em>#{machine}</em></font> !机器编码将决定获取的数据的唯一，请确保不重复。
