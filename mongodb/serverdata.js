@@ -379,10 +379,10 @@ serverAction.sendReadLike = async (wx) => {
 
         if (!data.length) return
 
-        let newDATA = []
+        let sendDATA = []
         data.map(item => {
             if (item.error) {
-                newDATA.push({
+                sendDATA.push({
                     "msgid": item.msgid,
                     "biz": item.biz,
                     "order_id": item.order_id,
@@ -390,7 +390,7 @@ serverAction.sendReadLike = async (wx) => {
                     "time": +new Date(item.time) / 1000
                 })
             } else {
-                newDATA.push({
+                sendDATA.push({
                     "order_id": item.order_id,
                     "msgid": item['_post'].mid + '_' + item['_post'].idx,
                     "biz": item['_post'].__biz,
@@ -407,15 +407,17 @@ serverAction.sendReadLike = async (wx) => {
         }).catch(err => console.log('获取wx数据库失败', err))
         let exact = info.exact
 
-        let result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticle', {
-            type: exact ? 3 : 1,
-            machine_num: wx,
-            data: newDATA
-        }).catch(async err => {
-            return await serverAction.recordErrNet(err, 'sendHandleReadLike').catch(err => ({
-                error: true
-            }))
-        })
+        for (var i = 0; i <= sendDATA.length; i++) {
+            let result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticle', {
+                type: exact ? 3 : 1,
+                machine_num: wx,
+                data: [sendDATA[i]]
+            }).catch(async err => {
+                return await serverAction.recordErrNet(err, 'sendHandleReadLike').catch(err => ({
+                    error: true
+                }))
+            })
+        }
 
         let updateHandleReadLike = await dbAction.updateMany('handlereadlike', {
             _id: {
@@ -492,7 +494,6 @@ serverAction.sendFind = async (wx) => {
 
             }
         })
-
 
 
         for (var i = 0; i <= sendDATA.length; i++) {
