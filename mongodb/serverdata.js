@@ -442,51 +442,54 @@ serverAction.sendFind = async (wx) => {
         data.map(item => {
             let mid = ''
             if (item.data.length) {
+                let firstDATA = item.data[0]
                 // 获取一下mid, 从有content_url拿到mid
-                item.data.forEach(fone => {
-                    if (fone.app_msg_ext_info) {
-                        if (fone.app_msg_ext_info.content_url != undefined) {
-                            let url = fone.app_msg_ext_info.content_url.replace(/amp;/ig, '')
-                            if (url) mid = helper.postDATA(url).mid
-                        }
-                        if (fone.app_msg_ext_info.multi_app_msg_item_list.length) {
-                            fone.app_msg_ext_info.multi_app_msg_item_list.map(ftwo => {
-                                let suburl = ftwo.content_url.replace(/amp;/ig, '')
-                                if (suburl) mid = helper.postDATA(suburl).mid
-                            })
-                        }
+
+                if (firstDATA.app_msg_ext_info) {
+                    if (firstDATA.app_msg_ext_info.content_url != undefined) {
+                        let url = firstDATA.app_msg_ext_info.content_url.replace(/amp;/ig, '')
+                        if (url) mid = helper.postDATA(url).mid
                     }
-                })
-                item.data.map((first) => {
-                    if (first.app_msg_ext_info) {
-                        if (first.app_msg_ext_info.content_url != undefined) {
-                            let url = first.app_msg_ext_info.content_url.replace(/amp;/ig, '')
-                            sendDATA.push({ // 考虑删文的情况, 就是url没了
-                                url: url,
-                                msgid: mid + '_1',
+                    if (firstDATA.app_msg_ext_info.multi_app_msg_item_list.length) {
+                        firstDATA.app_msg_ext_info.multi_app_msg_item_list.map(ftwo => {
+                            let suburl = ftwo.content_url.replace(/amp;/ig, '')
+                            if (suburl) mid = helper.postDATA(suburl).mid
+                        })
+                    }
+                }
+
+
+                if (firstDATA.app_msg_ext_info) {
+                    if (firstDATA.app_msg_ext_info.content_url != undefined) {
+                        let url = firstDATA.app_msg_ext_info.content_url.replace(/amp;/ig, '')
+                        sendDATA.push({ // 考虑删文的情况, 就是url没了
+                            url: url,
+                            msgid: mid + '_1',
+                            biz: item.biz,
+                            token: item.token,
+                            machine_num: item.wx,
+                            title: firstDATA.app_msg_ext_info.title,
+                            date: firstDATA.comm_msg_info.datetime,
+                        })
+                    }
+                    if (firstDATA.app_msg_ext_info.multi_app_msg_item_list.length) {
+                        firstDATA.app_msg_ext_info.multi_app_msg_item_list.map((sub, subidx) => {
+                            sendDATA.push({
+                                url: sub.content_url.replace(/amp;/ig, ''),
+                                msgid: mid + '_' + (subidx + 2),
                                 biz: item.biz,
                                 token: item.token,
                                 machine_num: item.wx,
-                                title: first.app_msg_ext_info.title,
-                                date: first.comm_msg_info.datetime,
+                                title: sub.title,
+                                date: firstDATA.comm_msg_info.datetime,
                             })
-                        }
-                        if (first.app_msg_ext_info.multi_app_msg_item_list.length) {
-                            first.app_msg_ext_info.multi_app_msg_item_list.map((sub, subidx) => {
-                                sendDATA.push({
-                                    url: sub.content_url.replace(/amp;/ig, ''),
-                                    msgid: mid + '_' + (subidx + 2),
-                                    biz: item.biz,
-                                    token: item.token,
-                                    machine_num: item.wx,
-                                    title: sub.title,
-                                    date: first.comm_msg_info.datetime,
-                                })
 
-                            })
-                        }
+                        })
                     }
-                })
+                }
+
+                console.log(mid, item.biz, 'sss')
+
             }
         })
 
