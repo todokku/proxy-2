@@ -6,6 +6,7 @@ var logger = require('morgan');
 var stylus = require('stylus');
 
 var indexRouter = require('./routes/index');
+var dataRouter = require('./routes/data');
 var usersRouter = require('./routes/users');
 
 var app = express();
@@ -24,6 +25,7 @@ app.use(stylus.middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/data', dataRouter);
 app.use('/users', usersRouter);
 
 
