@@ -96,7 +96,8 @@ router.get('/find', async function (req, res, next) {
         let wxDATA = await dbAction.findOne('wx', {
             wx
         }).catch(err => console.log('读取wx数据库失败', err))
-        timeout = (+new Date - wxDATA.historytime)
+
+        timeout = 3660 - ((+new Date - wxDATA.historytime) / 1000)
         type = 'timeout'
     }
     res.render('find', {
