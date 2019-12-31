@@ -187,7 +187,7 @@ module.exports = {
                     })
                 } else {
 
-                    let nextlink = nextReadLikeDATA['promotion_url'].replace(/amp;/ig, '').replace(/(#rd|#wechat_redirect)/, `&wx=${wx}&order_id=${nextReadLikeDATA.order_id}&unique=${nextReadLikeDATA.unique}&scene=27#wechat_redirect`)
+                    let nextlink = nextReadLikeDATA['promotion_url'].replace(/amp;/ig, '').replace(/(#rd|#wechat_redirect)/, `&wx=${wx}&order_id=${nextReadLikeDATA.order_id}&unique=${nextReadLikeDATA.unique}&nowtime=${ +new Date }&scene=27#wechat_redirect`)
 
                     console.log(nextlink, '吓一跳数')
 

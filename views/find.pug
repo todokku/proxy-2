@@ -23,7 +23,7 @@ block content
     var wx = #{wx}
     if (type == 'timeout') {
       var time = document.querySelector('#time')
-      var t = #{t}
+      var t = #{timeout}
       var timer = setInterval(() => {
           if (t <= 0) {
               clearInterval(timer)

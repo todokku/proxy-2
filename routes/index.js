@@ -9,6 +9,8 @@ router.get('/find', async function (req, res, next) {
     let action = req.query.action
     let wx = ~~req.query.wx
     let nextLink = {}
+    let timeout = false
+
     if (!wx) {
         return res.render('find', {
             type: 'error',
@@ -39,21 +41,29 @@ router.get('/find', async function (req, res, next) {
         }, updateDATA).catch(err => console.log('写入wx数据库失败', err))
 
         let findDATA = await dbAction.find('find', {
-            wx
+            wx,
+            finish: { // 是否有未采集的数据
+                $exists: false
+            }
         }).catch(err => console.log('查询find数据库失败', err))
 
         if (!findDATA.length) type = 'nothing'
 
         if (findDATA.length) { // 如果有此微信数据
             nextLink = await serverAction.getFindNext(wx).catch(err => console.log('查询find数据库失败', err))
-            dbAction.findOneAndUpdate('wx', {
-                wx
-            }, {
-                historytime: +new Date
-            })
             if (nextLink.timeout) {
+                let wxDATA = await dbAction.findOne('wx', {
+                    wx
+                }).catch(err => console.log('读取wx数据库失败', err))
+                timeout = (+new Date - wxDATA.historytime)
                 type = 'timeout'
+
             } else {
+                dbAction.findOneAndUpdate('wx', {
+                    wx
+                }, {
+                    historytime: +new Date
+                })
                 type = 'canNext'
             }
         }
@@ -64,14 +74,18 @@ router.get('/find', async function (req, res, next) {
 
         if (!findDATA.nothing || findDATA.ok) {
             nextLink = await serverAction.getFindNext(wx).catch(err => console.log('查询find数据库失败', err))
-            dbAction.findOneAndUpdate('wx', {
-                wx
-            }, {
-                historytime: +new Date
-            })
             if (nextLink.timeout) {
+                let wxDATA = await dbAction.findOne('wx', {
+                    wx
+                }).catch(err => console.log('读取wx数据库失败', err))
+                timeout = (+new Date - wxDATA.historytime)
                 type = 'timeout'
             } else {
+                dbAction.findOneAndUpdate('wx', {
+                    wx
+                }, {
+                    historytime: +new Date
+                })
                 type = 'canNext'
             }
         } else {
@@ -79,9 +93,14 @@ router.get('/find', async function (req, res, next) {
         }
     }
     if (action && action == 'timeout') {
+        let wxDATA = await dbAction.findOne('wx', {
+            wx
+        }).catch(err => console.log('读取wx数据库失败', err))
+        timeout = (+new Date - wxDATA.historytime)
         type = 'timeout'
     }
     res.render('find', {
+        timeout,
         type,
         wx,
         nextLink
@@ -159,6 +178,7 @@ router.get('/readlike', async function (req, res, next) {
         let wxDATA = await dbAction.findOne('wx', {
             wx
         }).catch(err => console.log('读取wx数据库失败', err))
+
         timeout = 10 * 60 * 1000 - (+new Date - wxDATA.articletime)
 
         if (timeout <= 10000) { // 如果小于10秒则不倒计时了

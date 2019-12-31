@@ -1,9 +1,6 @@
 exports.postDATA = function (url) {
-
     url = url.replace(/amp;/ig, '').replace(/http(s?):\/\/mp.weixin.qq.com\/s\?/, '')
-
     url = url.replace(/https:\/\/mp.weixin.qq.com\/mp\/profile_ext\?/, '')
-
     var obj = {};
     url.split("&").map(item => {
         let newItem = item.split("=");
@@ -43,7 +40,6 @@ exports.nowDATE = function () {
     var ts = date.getSeconds() >= 10 ? date.getSeconds() : '0' + date.getSeconds()
     return `${y}-${m}-${d} ${th}:${tm}:${ts}`
 }
-
 
 exports.cut = (data, num = 1, nowtime, curIndex) => {
     var tmpArr = []
