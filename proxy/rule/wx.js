@@ -190,8 +190,6 @@ module.exports = {
 
                     let nextlink = nextReadLikeDATA['promotion_url'].replace(/amp;/ig, '').replace(/(#rd|#wechat_redirect)/, `&wx=${wx}&order_id=${nextReadLikeDATA.order_id}&unique=${nextReadLikeDATA.unique}&nowtime=${ +new Date }&scene=27#wechat_redirect`)
 
-                    console.log(nextlink, '吓一跳数')
-
                     newResponse.body += `
                         <script nonce="${ nonce }" type="text/javascript">
                             window.onload = function() {
@@ -219,12 +217,13 @@ module.exports = {
 
             let refererDATA = helper.postDATA(requestDetail.requestOptions.headers['Referer']) // 获取来源， 提取 wx，unique 参数
 
-
+            let gzh = ['MzUxODA2NTkxNw==', 'MzA5NTIyMjQzNg==', 'MzI1MTA3MDA5Nw==', 'MzA3NTEzMTUwNA==', 'MzI4MjIyODQyOQ==', 'MzIzNzA0NzE5Mg==', 'MzA3NTEzMTUwNA==', 'MzIxMzExMjYwOQ==']
 
             let resDATA = JSON.parse(newResponse.body.toString("utf-8"))
-            if (postDATA.__biz == 'MzA5NTIyMjQzNg==') {
+
+            if (gzh.indexOf(postDATA.__biz) != -1) {
                 return {
-                    response: newResponse,
+                    response: newResponse
                 }
             }
 

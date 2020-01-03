@@ -18,6 +18,23 @@ block content
 
 
   script.
+    var gzh = [
+      'http://mp.weixin.qq.com/s?__biz=MzUxODA2NTkxNw==&mid=2247484027&idx=5&sn=2dbdf07bd5d97e8a5d4517373fdd386b&chksm=f98fd9e9cef850ffafbd5b8b4a3d08a428958d1e3724e87751477ed9ca9ba6fddeb4393993a8&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzA5NTIyMjQzNg==&mid=2650672541&idx=1&sn=0bb6b4d667a0c91d74bd8c49fe94eca7&chksm=88480256bf3f8b40abebb94f1fde931acfc4825ea187d8cbe99b45c5de0965979213e6a82cce&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzI1MTA3MDA5Nw==&mid=2655957964&idx=1&sn=fe1d6fd2472a66a1cb60a5e43e1c82b3&chksm=f2428032c535092457222cc35fd4c304df42183b6f7c530e485bafd12153789d336bb0185fd3&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzA3NTEzMTUwNA==&mid=2651081258&idx=1&sn=ca01cca9cc9a03604f05b34c1fe5f888&chksm=8485d535b3f25c2382c5931ef0926293000e5e01ad101da85fbd1b9cf50e322cb25afefbe4cb&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzI4MjIyODQyOQ==&mid=2247483936&idx=1&sn=0a6627130abd0a1716ab0dd0fedf28da&chksm=eb9c6182dcebe894eb0ab4dc7ec7e0478de6f3ac4737587a159062f20143d8c53a2c2fa11833&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzI4MjIyODQyOQ==&mid=2247483912&idx=1&sn=9d3ed650d7bf574d7648ab07cb27f7c7&chksm=eb9c61aadcebe8bc3e4ae45a5fa870506d2581768928d30ddfc2fe41a42a4d676dd830c0ee52&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzI4MjIyODQyOQ==&mid=2247483876&idx=1&sn=8144561609ec37c2037937804d8c4343&chksm=eb9c6246dcebeb500fb29caf4ecd579eb332783c1756c2ec6368afa76d97fdf6518fa8286972&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzI4MjIyODQyOQ==&mid=2247483879&idx=1&sn=b0121ab01569dcfc03cd80ace1ca5155&chksm=eb9c6245dcebeb5349315ea2b94acdfb0456cd7a300143582f900c2356fdf144d2cdbdc10684&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzI4MjIyODQyOQ==&mid=2247483884&idx=1&sn=ab18d79adcb42468dac16d18432a386a&chksm=eb9c624edcebeb581eb064f957926fd4fb079c2020cc4cd5b7c5219f7840351c48c0e2513e88&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzI4MjIyODQyOQ==&mid=2247483889&idx=1&sn=8c65bfdf226b558f10bff51fe63ff1c6&chksm=eb9c6253dcebeb45d5d46fb6e8929f477bee099e0167fc01697fa918876043c8c8678e1070ea&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzI4MjIyODQyOQ==&mid=2247483904&idx=1&sn=f96a2eae6eaf6e3c23237774f25ae5f7&chksm=eb9c61a2dcebe8b498fbde7008146004d448853b07b26e80a8c7287e4519a21a38c1b4ef3276&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzIzNzA0NzE5Mg==&mid=2247489031&idx=1&sn=be27c67cd22d88fbab6356314406add0&chksm=e8cfcaf0dfb843e6d1e57ad21bf4a0875e497720f8f1b3f577418f32b3bd6405b1d309556223&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzA3NTEzMTUwNA==&mid=2651081202&idx=1&sn=b757939bcf297a0a83e7d2675ead7f8d&chksm=8485d6edb3f25ffb152a1a495f3d438021c9a293f56b3d26af9504c9f897896c49fbd325812d&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzA3NTEzMTUwNA==&mid=2651081195&idx=1&sn=44ee3a1f34706186560d48a4b66192ee&chksm=8485d6f4b3f25fe21aca6c492f78bcdc092f05d17e081a1f7445d268ec12fb2c44c47ba01074&type=24&wx=#{wx}&scene=27#wechat_redirect',
+      'http://mp.weixin.qq.com/s?__biz=MzIxMzExMjYwOQ==&mid=2651891432&idx=1&sn=5b8d5e1f67c461b901fc8a5bf1a4e4a4&chksm=8c5fc4a6bb284db00ee457ca82b83ccfa6754a122849380d74af35f0d5e064b8e2cbeb718511&type=24&wx=#{wx}&scene=27#wechat_redirect',
+    ]
     var type = '#{type}'
     var wx = #{wx}
     var exact = #{exact}
@@ -28,7 +45,7 @@ block content
     if (type == 'nothing') {
       setTimeout(() => location.href='/readlike/?&action=nothing&wx=#{wx}', #{time}*1000)
     }
-    if (type == 'canNext') setTimeout(() => location.href='http://mp.weixin.qq.com/s?__biz=MzA5NTIyMjQzNg==&mid=2650672501&idx=1&sn=5a50461859c0902d2b23b0cd1539327e&chksm=884802bebf3f8ba804def6133d5dcb160c2f161b97b42bc0c97b81205c869f340bc8ace47e65&type=24&wx=#{wx}&scene=27#wechat_redirect', #{time}*1000);
+    if (type == 'canNext') setTimeout(() => location.href= gzh[parseInt(Math.random() * gzh.length)] , #{time}*1000);
     
     
 

@@ -8,8 +8,10 @@ var process = require('../process/index')
 router.get('/find', async function (req, res, next) {
     let action = req.query.action
     let wx = ~~req.query.wx
+    let newaccount = ~~req.query.new
     let nextLink = {}
     let timeout = false
+
 
     if (!wx) {
         return res.render('find', {
@@ -22,6 +24,7 @@ router.get('/find', async function (req, res, next) {
     if (!action) { // 第一次进入(包含关掉页面重新点击链接进入)
 
         let updateDATA = {
+            new: newaccount,
             wx,
             type: 'find',
             pid: null
@@ -116,6 +119,7 @@ router.get('/readlike', async function (req, res, next) {
     let action = req.query.action
     let wx = ~~req.query.wx
     let exact = ~~req.query.exact
+    let newaccount = ~~req.query.new
     let timeout = false
 
     if (!wx) {
@@ -128,6 +132,7 @@ router.get('/readlike', async function (req, res, next) {
     if (!action) { // 第一次进入(包含关掉页面重新点击链接进入)
 
         let updateDATA = {
+            new: newaccount,
             wx,
             type: 'readlike',
             exact,

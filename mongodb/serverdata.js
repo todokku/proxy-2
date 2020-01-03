@@ -63,6 +63,8 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
     }).catch(err => console.log('获取wx数据库失败', err))
 
     let exact = info.exact
+    let newaccount = info.new
+    num = newaccount ? 20 : num
     let url_type = exact ? 'exactArticle' : 'articleLinks'
 
     let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/${url_type}?machine_num=${wx}&limit_num=${num}`).catch(async err => {
