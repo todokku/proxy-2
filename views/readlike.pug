@@ -45,7 +45,7 @@ block content
     if (type == 'nothing') {
       setTimeout(() => location.href='/readlike/?&action=nothing&wx=#{wx}', #{time}*1000)
     }
-    if (type == 'canNext') setTimeout(() => location.href= gzh[parseInt(Math.random() * gzh.length)] , #{time}*1000);
+    if (type == 'canNext') setTimeout(() => location.href= 'https://mp.weixin.qq.com/s?__biz=&mid=#{+new Date}&idx=&sn=&scene=&xtrack=1' , #{time}*1000);
     
     
 

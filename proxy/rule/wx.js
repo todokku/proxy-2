@@ -94,9 +94,9 @@ module.exports = {
                             </style>
                             <h2>这里是最后一条数据咯！</h2>
                             <script nonce="${ nonce }" type="text/javascript">
-                                window.onload = function() {
+                  
                                     setTimeout(() => location.href="http://127.0.0.1/find?action=${action}&wx=${ wx }",  3000) // 3秒后才跳转， 确保抓到数据
-                                }
+                           
                             </script>
                         `
                     resolve({
@@ -178,9 +178,9 @@ module.exports = {
                     </style>
                     <h2 id='end'>这里是最后一条数据咯！</h2>
                         <script nonce="${ nonce }" type="text/javascript">
-                            window.onload = function() {
-                                setTimeout(() => location.href="http://127.0.0.1/readlike?action=${action}&wx=${ wx }",  3000) // 3秒后才返回， 确保这一条拿到数据
-                            }
+               
+                            setTimeout(() => location.href="http://127.0.0.1/readlike?action=${action}&wx=${ wx }",  3000) // 3秒后才返回， 确保这一条拿到数据
+               
                         </script>
                     `
                     resolve({
@@ -192,9 +192,9 @@ module.exports = {
 
                     newResponse.body += `
                         <script nonce="${ nonce }" type="text/javascript">
-                            window.onload = function() {
-                                setTimeout(() => location.href="${ nextlink }", ${ helper.rdNum(9, 10)*1000 })
-                            }
+                    
+                            setTimeout(() => location.href="${ nextlink }", ${ helper.rdNum(9, 10)*1000 })
+                      
                         </script>
                     `
                     resolve({
