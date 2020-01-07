@@ -194,6 +194,7 @@ serverAction.sendReadLike = async (wx) => {
     setTimeout(async () => {
 
         let data = await dbAction.find('handlereadlike', {
+            wx,
             sended: {
                 $exists: false
             }
@@ -255,6 +256,7 @@ serverAction.sendReadLike = async (wx) => {
 serverAction.sendFind = async (wx) => {
     setTimeout(async () => {
         let data = await dbAction.find('handlefind', { // 获取还未发送到所有数据
+            wx,
             sended: {
                 $exists: false
             }
