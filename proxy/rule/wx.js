@@ -117,23 +117,29 @@ module.exports = {
         // 阅读数文章
         if (requestDetail.url.indexOf("mp.weixin.qq.com/s") != -1) {
             let wx = ~~helper.postDATA(requestDetail.url).wx
+            let resContent = newResponse.body.toString("utf-8")
             if (newResponse.header['Content-Security-Policy']) {
                 nonce = newResponse.header['Content-Security-Policy'].match(/nonce-\d+/g)[0].split('-')[1]
             }
-            if (newResponse.body.toString("utf-8").indexOf('该内容已被发布者删除') != -1) reason = '该内容已被发布者删除'
-            if (newResponse.body.toString("utf-8").indexOf('此内容因违规无法查看') != -1) reason = '此内容因违规无法查看'
-            if (newResponse.body.toString("utf-8").indexOf('此帐号处于帐号迁移流程中') != -1) reason = '此帐号处于帐号迁移流程中'
-            if (newResponse.body.toString("utf-8").indexOf('操作频繁，请稍候再试') != -1) reason = '操作频繁，请稍候再试'
-            if (newResponse.body.toString("utf-8").indexOf('访问过于频繁，请用微信扫描二维码进行访问') != -1) reason = '访问过于频繁，请用微信扫描二维码进行访问'
-            if (newResponse.body.toString("utf-8").indexOf('此帐号已被屏蔽, 内容无法查看') != -1) reason = '此帐号已被屏蔽, 内容无法查看'
+            if (resContent.indexOf('该内容已被发布者删除') != -1) reason = '该内容已被发布者删除'
+            if (resContent.indexOf('此内容因违规无法查看') != -1) reason = '此内容因违规无法查看'
+            if (resContent.indexOf('此帐号处于帐号迁移流程中') != -1) reason = '此帐号处于帐号迁移流程中'
+            if (resContent.indexOf('操作频繁，请稍候再试') != -1) reason = '操作频繁，请稍候再试'
+            if (resContent.indexOf('访问过于频繁，请用微信扫描二维码进行访问') != -1) reason = '访问过于频繁，请用微信扫描二维码进行访问'
+            if (resContent.indexOf('此帐号已被屏蔽, 内容无法查看') != -1) reason = '此帐号已被屏蔽, 内容无法查看'
             let query = helper.postDATA(requestDetail.url)
             if (reason != '') {
                 dbAction.insertOne('error_wx', {
                     time: helper.nowDATE(),
                     type: 'readlike',
                     wx,
-                    reason
+                    reason,
                 })
+                if (reason == '此内容因违规无法查看') {
+                    // var getReason = resContent.match(/<p class="tips">(.*)<a/)[1].match(/[\u2E80-\u9FFF]+/g)
+                    // reason += '，原因：' + getReason.slice(1, getReason.length - 1).join('或')
+                    reason += '，原因：' + resContent.match(/<p class="tips">(.*)<a/)[1].replace('，查看', '')
+                }
                 dbAction.insert('handlereadlike', {
                     unique: ~~query.unique,
                     wx: ~~query.wx,
@@ -157,6 +163,8 @@ module.exports = {
                         })
                     })
                 }
+
+
             }
 
             return new Promise(async (resolve, reject) => {
