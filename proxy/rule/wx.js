@@ -87,9 +87,8 @@ module.exports = {
                 if (findDATA.timeout || findDATA.nothing) { // 如果需要倒计时...(当前数据库列表的数据都已经抓取完成)
                     let action = findDATA.timeout ? 'timeout' : 'nothing'
                     newResponse.body = `
-                            <style>
-                                body {padding: 50px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
-                                #top { position: fixed; left: 0; top: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
+                            <style> 
+                                #top { position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                             </style>
                             <h2 id='top'>这里是最后一条数据啦。一轮完成啦。</h2>
                             <script nonce="${ nonce }" type="text/javascript">
@@ -182,8 +181,8 @@ module.exports = {
                     // 头部注入js， 防止注入底部不执行（页面其他js报错
                     bodycontent = bodycontent.replace(/(.{0})/, ` 
                         <style>
-                            body {padding: 50px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
-                            #top { position: fixed; left: 0; top: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
+                           
+                            #top { position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                         </style>
                         <h2 id='top'>这里是最后一条数据啦。一轮完成啦。</h2>
                         <script nonce="${ nonce }" type="text/javascript">
@@ -205,8 +204,8 @@ module.exports = {
                     // 头部注入js， 防止注入底部不执行（页面其他js报错
                     bodycontent = bodycontent.replace(/(.{0})/, ` 
                         <style>
-                            body {padding: 50px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
-                            #top { position: fixed; left: 0; top: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
+                          
+                            #top { position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                         </style>
                         <h2 id='top'>下一条链接地址：${nextlink}</h2>
                         <script nonce="${ nonce }" type="text/javascript">
