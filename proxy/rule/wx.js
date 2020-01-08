@@ -55,8 +55,6 @@ module.exports = {
                             error: true
                         }))
                     })
-
-
                     await axios.get(`https://www.yundiao365.com/crawler/index/gameOver?machine_num=${wx}&type=2`).catch(async err => {
                         return await serverAction.recordErrNet(err, 'sendGameOver').catch(err => ({
                             error: true
@@ -91,12 +89,11 @@ module.exports = {
                     newResponse.body = `
                             <style>
                                 body {padding: 50px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
+                                #top { position: fixed; left: 0; top: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                             </style>
-                            <h2>这里是最后一条数据咯！</h2>
+                            <h2 id='top'>这里是最后一条数据啦。一轮完成啦。</h2>
                             <script nonce="${ nonce }" type="text/javascript">
-                  
-                                    setTimeout(() => location.href="http://127.0.0.1/find?action=${action}&wx=${ wx }",  3000) // 3秒后才跳转， 确保抓到数据
-                           
+                                setTimeout(() => location.href="http://127.0.0.1/find?action=${action}&wx=${ wx }",  3000) // 3秒后才跳转， 确保抓到数据
                             </script>
                         `
                     resolve({
@@ -149,13 +146,11 @@ module.exports = {
                 if (reason == '操作频繁，请稍候再试' || reason == '访问过于频繁，请用微信扫描二维码进行访问') { // 如果操作频繁。就返回错误，表示此微信也不可用
                     return new Promise(async (resolve, reject) => {
                         await serverAction.getReadLikeAll(wx, 0).catch(err => console.log(err)) // 回收资源
-
                         await axios.get(`https://www.yundiao365.com/crawler/index/gameOver?machine_num=${wx}&type=1`).catch(async err => {
                             return await serverAction.recordErrNet(err, 'sendGameOver').catch(err => ({
                                 error: true
                             }))
                         })
-
                         newResponse.body += `<p>停止时间：<font color="red">${ helper.nowDATE() }</font><p>`
                         resolve({
                             response: newResponse
@@ -171,18 +166,23 @@ module.exports = {
                     if (nextReadLikeDATA.nothing) action = 'nothing'
                     if (nextReadLikeDATA.waiting) action = 'waiting'
                     if (nextReadLikeDATA.timeout) action = 'timeout'
-                    newResponse.body += `
-                    <style>
-                        body {padding: 50px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
-                        #end { position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; }
-                    </style>
-                    <h2 id='end'>这里是最后一条数据咯！</h2>
+
+                    let bodycontent = newResponse.body.toString("utf-8")
+
+                    bodycontent = bodycontent.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, '') // 去除img
+
+                    // 头部注入js， 防止注入底部不执行（页面其他js报错
+                    bodycontent = bodycontent.replace(/(.{0})/, ` 
+                        <style>
+                            body {padding: 50px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
+                            #top { position: fixed; left: 0; top: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
+                        </style>
+                        <h2 id='top'>这里是最后一条数据啦。一轮完成啦。</h2>
                         <script nonce="${ nonce }" type="text/javascript">
-               
                             setTimeout(() => location.href="http://127.0.0.1/readlike?action=${action}&wx=${ wx }",  3000) // 3秒后才返回， 确保这一条拿到数据
-               
                         </script>
-                    `
+                    `)
+                    newResponse.body = bodycontent
                     resolve({
                         response: newResponse
                     })
@@ -190,13 +190,24 @@ module.exports = {
 
                     let nextlink = nextReadLikeDATA['promotion_url'].replace(/amp;/ig, '').replace(/(#rd|#wechat_redirect)/, `&wx=${wx}&order_id=${nextReadLikeDATA.order_id}&unique=${nextReadLikeDATA.unique}&nowtime=${ +new Date }&scene=27#wechat_redirect`)
 
-                    newResponse.body += `
+                    let bodycontent = newResponse.body.toString("utf-8")
+
+                    bodycontent = bodycontent.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, '') // 去除img
+
+                    // 头部注入js， 防止注入底部不执行（页面其他js报错
+                    bodycontent = bodycontent.replace(/(.{0})/, ` 
+                        <style>
+                            body {padding: 50px; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
+                            #top { position: fixed; left: 0; top: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
+                        </style>
+                        <h2 id='top'>下一条链接地址：${nextlink}</h2>
                         <script nonce="${ nonce }" type="text/javascript">
-                    
                             setTimeout(() => location.href="${ nextlink }", ${ helper.rdNum(9, 10)*1000 })
-                      
                         </script>
-                    `
+                    `)
+
+                    newResponse.body = bodycontent
+
                     resolve({
                         response: newResponse
                     });
@@ -217,15 +228,7 @@ module.exports = {
 
             let refererDATA = helper.postDATA(requestDetail.requestOptions.headers['Referer']) // 获取来源， 提取 wx，unique 参数
 
-            let gzh = ['MzUxODA2NTkxNw==', 'MzA5NTIyMjQzNg==', 'MzI1MTA3MDA5Nw==', 'MzA3NTEzMTUwNA==', 'MzI4MjIyODQyOQ==', 'MzIzNzA0NzE5Mg==', 'MzA3NTEzMTUwNA==', 'MzIxMzExMjYwOQ==']
-
             let resDATA = JSON.parse(newResponse.body.toString("utf-8"))
-
-            if (gzh.indexOf(postDATA.__biz) != -1) {
-                return {
-                    response: newResponse
-                }
-            }
 
             if (resDATA.base_resp && resDATA.base_resp['errmsg'] != undefined) {
                 dbAction.insert('handlereadlike', {
@@ -266,9 +269,7 @@ module.exports = {
                         'content-type': 'text/html'
                     },
                     body: `<script nonce="" type="text/javascript">
-                        window.onload = function() {
-                            setTimeout(() => location.href="http://127.0.0.1/readlike?&wx=${wx}", 30)
-                        }
+                        setTimeout(() => location.href="http://127.0.0.1/readlike?&wx=${wx}", 30)
                     </script>`
                 }
             }
@@ -282,9 +283,7 @@ module.exports = {
                         'content-type': 'text/html'
                     },
                     body: `<script nonce="" type="text/javascript">
-                        window.onload = function() {
-                            setTimeout(() => location.href="http://127.0.0.1/find?&wx=${wx}", 30)
-                        }
+                        setTimeout(() => location.href="http://127.0.0.1/find?&wx=${wx}", 30)
                     </script>`
                 }
             }

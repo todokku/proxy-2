@@ -53,7 +53,7 @@ router.get('/find', async function (req, res, next) {
         if (!findDATA.length) type = 'nothing'
 
         if (findDATA.length) { // 如果有此微信数据
-            nextLink = await serverAction.getFindNext(wx).catch(err => console.log('查询find数据库失败', err))
+            nextLink = await serverAction.getFindNext(~~wx).catch(err => console.log('查询find数据库失败', err))
             if (nextLink.timeout) {
                 let wxDATA = await dbAction.findOne('wx', {
                     wx
@@ -162,7 +162,7 @@ router.get('/readlike', async function (req, res, next) {
         type = readLikeDATA.length ? 'canNext' : 'nothing'
     }
     if (action && action == 'nothing') { // 如果是没数据的情况
-        let readLikeDATA = await serverAction.getReadLikeAll(wx).catch(err => console.log('查询handle数据库失败', err))
+        let readLikeDATA = await serverAction.getReadLikeAll(~~wx).catch(err => console.log('查询handle数据库失败', err))
         // 设置微信的使用情况
         if (!readLikeDATA.nothing || readLikeDATA.ok) {
             await dbAction.findOneAndUpdate('wx', {

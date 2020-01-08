@@ -59,7 +59,7 @@ serverAction.getFindAll = async (wx, num = 8) => {
 serverAction.getReadLikeAll = async (wx, num = 60) => {
 
     let info = await dbAction.findOne('wx', {
-        wx
+        wx: ~~wx,
     }).catch(err => console.log('获取wx数据库失败', err))
 
     let exact = info.exact
@@ -226,7 +226,7 @@ serverAction.sendReadLike = async (wx) => {
         })
 
         let info = await dbAction.findOne('wx', {
-            wx
+            wx: ~~wx
         }).catch(err => console.log('获取wx数据库失败', err))
         let exact = info.exact
 
