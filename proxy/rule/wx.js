@@ -88,7 +88,7 @@ module.exports = {
                     let action = findDATA.timeout ? 'timeout' : 'nothing'
                     newResponse.body = `
                             <style> 
-                                #top { position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
+                                #top {z-index: 999; position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                             </style>
                             <h2 id='top'>这里是最后一条数据啦。一轮完成啦。</h2>
                             <script nonce="${ nonce }" type="text/javascript">
@@ -182,7 +182,7 @@ module.exports = {
                     bodycontent = bodycontent.replace(/(.{0})/, ` 
                         <style>
                            
-                            #top { position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
+                            #top {z-index: 999; position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                         </style>
                         <h2 id='top'>这里是最后一条数据啦。一轮完成啦。</h2>
                         <script nonce="${ nonce }" type="text/javascript">
@@ -205,7 +205,7 @@ module.exports = {
                     bodycontent = bodycontent.replace(/(.{0})/, ` 
                         <style>
                           
-                            #top { position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
+                            #top {z-index: 999; position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                         </style>
                         <h2 id='top'>下一条链接地址：${nextlink}</h2>
                         <script nonce="${ nonce }" type="text/javascript">
