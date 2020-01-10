@@ -28,6 +28,9 @@ serverAction.recordErrNet = async (err, type) => {
     })
 }
 
+
+
+
 serverAction.recordErrDb = async (data) => {
     await dbAction.insertOne('error_net', Object.assign({
         time: helper.nowDATE(),
@@ -40,9 +43,25 @@ serverAction.getFindAll = async (wx, num = 8) => {
             error: true
         }))
     })
+
     if (resDATA.error) return ({ // 请求错误就返回给前台，等10秒后再请求
         nothing: true
     })
+
+    if (!resDATA.error) {
+        // 记录发送数据结果
+        await dbAction.insertOne('send_net', {
+            time: helper.nowDATE(),
+            wx,
+            type: 'getFindAll',
+            resdata: result.data,
+            resstatus: result.status,
+            _res: result,
+        }).catch(err => console.log('数据库写入错误'))
+    }
+
+
+
     let LinkDATA = resDATA.data.data
     if (!LinkDATA.length) return ({ // 如果数据为空就返回给前台，等10秒后再请求
         nothing: true,
@@ -72,9 +91,24 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
             error: true
         }))
     })
+
     if (resDATA.error) return ({
         nothing: true
     })
+
+    if (!resDATA.error) {
+        // 记录发送数据结果
+        await dbAction.insertOne('send_net', {
+            time: helper.nowDATE(),
+            wx,
+            type: 'getFindReadLike',
+            resdata: result.data,
+            resstatus: result.status,
+            _res: result,
+        }).catch(err => console.log('数据库写入错误'))
+    }
+
+
     let LinkDATA = resDATA.data.data
     if (!LinkDATA.length) return ({ // 如果请求失败，或者数据为空，都让前台处理
         nothing: true,
@@ -127,7 +161,7 @@ serverAction.setAction = async (data) => {
 /**
  * 获取下一条数据
  */
-serverAction.getReadLikeNext = async (wx = 1) => { // 前台页会确保有数据才会执行此方法
+serverAction.getReadLikeNext = async (wx) => { // 前台页会确保有数据才会执行此方法
 
     // 是否还有待抓取的数据
     let readLikeDATA = await dbAction.find('readlike', {
@@ -240,6 +274,19 @@ serverAction.sendReadLike = async (wx) => {
                     error: true
                 }))
             })
+
+            if (!result.error) {
+                // 记录发送数据结果
+                await dbAction.insertOne('send_net', {
+                    time: helper.nowDATE(),
+                    wx,
+                    senddata: sendDATA[i],
+                    type: 'sendReadLike',
+                    resdata: result.data,
+                    resstatus: result.status,
+                    _res: result,
+                }).catch(err => console.log('数据库写入错误'))
+            }
         }
 
         let updateHandleReadLike = await dbAction.updateMany('handlereadlike', {
@@ -313,15 +360,12 @@ serverAction.sendFind = async (wx) => {
                         })
                     }
                 }
-
-                console.log(mid, item.biz, 'sss')
-
             }
         })
 
 
         for (var i = 0; i < sendDATA.length; i++) {
-            var updateResult = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticleDetail', {
+            var result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticleDetail', {
                 machine_num: wx,
                 data: [sendDATA[i]]
             }).catch(async err => {
@@ -329,6 +373,19 @@ serverAction.sendFind = async (wx) => {
                     error: true
                 }))
             })
+
+            if (!result.error) {
+                // 记录发送数据结果
+                await dbAction.insertOne('send_net', {
+                    time: helper.nowDATE(),
+                    wx,
+                    senddata: sendDATA[i],
+                    type: 'sendFind',
+                    resdata: result.data,
+                    resstatus: result.status,
+                    _res: result,
+                }).catch(err => console.log('数据库写入错误'))
+            }
         }
 
         var updateHandleFind = await dbAction.updateMany('handlefind', {
