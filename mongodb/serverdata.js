@@ -56,7 +56,7 @@ serverAction.getFindAll = async (wx, num = 8) => {
             type: 'getFindAll',
             resdata: resDATA.data,
             resstatus: resDATA.status,
-            _res: resDATA,
+
         }).catch(err => console.log('数据库写入错误'))
     }
 
@@ -104,7 +104,6 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
             type: 'getFindReadLike',
             resdata: resDATA.data,
             resstatus: resDATA.status,
-            _res: resDATA,
         }).catch(err => console.log('数据库写入错误'))
     }
 
@@ -284,7 +283,7 @@ serverAction.sendReadLike = async (wx) => {
                     type: 'sendReadLike',
                     resdata: result.data,
                     resstatus: result.status,
-                    _res: result,
+
                 }).catch(err => console.log('数据库写入错误'))
             }
         }
@@ -383,7 +382,7 @@ serverAction.sendFind = async (wx) => {
                     type: 'sendFind',
                     resdata: result.data,
                     resstatus: result.status,
-                    _res: result,
+
                 }).catch(err => console.log('数据库写入错误'))
             }
         }
