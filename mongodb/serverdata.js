@@ -54,9 +54,9 @@ serverAction.getFindAll = async (wx, num = 8) => {
             time: helper.nowDATE(),
             wx,
             type: 'getFindAll',
-            resdata: result.data,
-            resstatus: result.status,
-            _res: result,
+            resdata: resDATA.data,
+            resstatus: resDATA.status,
+            _res: resDATA,
         }).catch(err => console.log('数据库写入错误'))
     }
 
@@ -102,9 +102,9 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
             time: helper.nowDATE(),
             wx,
             type: 'getFindReadLike',
-            resdata: result.data,
-            resstatus: result.status,
-            _res: result,
+            resdata: resDATA.data,
+            resstatus: resDATA.status,
+            _res: resDATA,
         }).catch(err => console.log('数据库写入错误'))
     }
 
