@@ -247,7 +247,7 @@ serverAction.sendReadLikeSingle = async (sendDATA, type, wx, i = 0) => {
         }).catch(err => console.log('数据库写入错误'))
     }
 
-    if (i >= sendDATA.length) {
+    if (i >= sendDATA.length - 1) {
         return true
     } else {
         return await serverAction.sendReadLikeSingle(sendDATA, type, wx, i + 1)
@@ -333,6 +333,39 @@ serverAction.sendReadLike = async (wx) => {
     }, 10000) // 10秒后发送数据 （确保最后一条写入数据库了
 }
 
+
+
+serverAction.sendFindSingle = async (sendDATA, wx, i = 0) => {
+
+    var result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticleDetail', {
+        machine_num: wx,
+        data: [sendDATA[i]]
+    }).catch(async err => {
+        return await serverAction.recordErrNet(err, 'sendHandleFind').catch(err => ({
+            error: true
+        }))
+    })
+
+    if (!result.error) {
+        // 记录发送数据结果
+        await dbAction.insertOne('send_net', {
+            time: helper.nowDATE(),
+            wx,
+            senddata: sendDATA[i],
+            type: 'sendFind',
+            resdata: result.data,
+            resstatus: result.status,
+
+        }).catch(err => console.log('数据库写入错误'))
+    }
+
+    if (i >= sendDATA.length - 1) {
+        return true
+    } else {
+        return await serverAction.sendFindSingle(sendDATA, wx, i + 1)
+    }
+
+}
 serverAction.sendFind = async (wx) => {
     setTimeout(async () => {
         let data = await dbAction.find('handlefind', { // 获取还未发送到所有数据
@@ -397,29 +430,31 @@ serverAction.sendFind = async (wx) => {
         })
 
 
-        for (var i = 0; i < sendDATA.length; i++) {
-            var result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticleDetail', {
-                machine_num: wx,
-                data: [sendDATA[i]]
-            }).catch(async err => {
-                return await serverAction.recordErrNet(err, 'sendHandleFind').catch(err => ({
-                    error: true
-                }))
-            })
+        // for (var i = 0; i < sendDATA.length; i++) {
+        //     var result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticleDetail', {
+        //         machine_num: wx,
+        //         data: [sendDATA[i]]
+        //     }).catch(async err => {
+        //         return await serverAction.recordErrNet(err, 'sendHandleFind').catch(err => ({
+        //             error: true
+        //         }))
+        //     })
 
-            if (!result.error) {
-                // 记录发送数据结果
-                await dbAction.insertOne('send_net', {
-                    time: helper.nowDATE(),
-                    wx,
-                    senddata: sendDATA[i],
-                    type: 'sendFind',
-                    resdata: result.data,
-                    resstatus: result.status,
+        //     if (!result.error) {
+        //         // 记录发送数据结果
+        //         await dbAction.insertOne('send_net', {
+        //             time: helper.nowDATE(),
+        //             wx,
+        //             senddata: sendDATA[i],
+        //             type: 'sendFind',
+        //             resdata: result.data,
+        //             resstatus: result.status,
 
-                }).catch(err => console.log('数据库写入错误'))
-            }
-        }
+        //         }).catch(err => console.log('数据库写入错误'))
+        //     }
+        // }
+
+        await serverAction.sendFindSingle(sendDATA, wx)
 
         var updateHandleFind = await dbAction.updateMany('handlefind', {
             wx,
