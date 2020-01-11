@@ -357,6 +357,11 @@ serverAction.sendFindSingle = async (sendDATA, wx, i = 0) => {
         }).catch(err => console.log('数据库写入错误'))
     }
 
+    let updateResult = await dbAction.updateOne('handlefind', { // 更新当前数据为 已完成 状态
+        _id: sendDATA[i]._id
+    }, {
+        sended: true
+    }).catch(err => console.log('更新handlefind数据库失败', err))
     if (i >= sendDATA.length - 1) {
         return true
     } else {
@@ -367,7 +372,7 @@ serverAction.sendFindSingle = async (sendDATA, wx, i = 0) => {
 serverAction.sendFind = async (wx) => {
     setTimeout(async () => {
         let data = await dbAction.find('handlefind', { // 获取还未发送到所有数据
-            wx,
+            wx: '' + wx,
             sended: {
                 $exists: false
             }
@@ -394,8 +399,6 @@ serverAction.sendFind = async (wx) => {
                         })
                     }
                 }
-
-
                 if (firstDATA.app_msg_ext_info) {
                     if (firstDATA.app_msg_ext_info.content_url != undefined) {
                         let url = firstDATA.app_msg_ext_info.content_url.replace(/amp;/ig, '')
@@ -427,6 +430,8 @@ serverAction.sendFind = async (wx) => {
             }
         })
 
+        await serverAction.sendFindSingle(sendDATA, wx)
+
 
         // for (var i = 0; i < sendDATA.length; i++) {
         //     var result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticleDetail', {
@@ -452,16 +457,16 @@ serverAction.sendFind = async (wx) => {
         //     }
         // }
 
-        await serverAction.sendFindSingle(sendDATA, wx)
 
-        var updateHandleFind = await dbAction.updateMany('handlefind', {
-            wx,
-            _id: {
-                $lte: data[data.length - 1]._id
-            },
-        }, {
-            sended: true
-        }).catch(err => console.log('更新handlefind数据库失败', err))
+
+        // var updateHandleFind = await dbAction.updateMany('handlefind', {
+        //     wx,
+        //     _id: {
+        //         $lte: data[data.length - 1]._id
+        //     },
+        // }, {
+        //     sended: true
+        // }).catch(err => console.log('更新handlefind数据库失败', err))
 
     }, 10000) // 10秒后发送数据 （确保最后一条写入数据库了
 

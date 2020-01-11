@@ -44,8 +44,8 @@ module.exports = {
                 dbAction.insertOne('error_wx', {
                     time: helper.nowDATE(),
                     type: 'home',
-                    wx,
-                    machine_num: wx,
+                    wx: ~~wx,
+                    machine_num: ~~wx,
                     reason: '操作频繁，请稍后再试'
                 })
                 // 释放资源
@@ -77,8 +77,8 @@ module.exports = {
                     biz: helper.postDATA(requestDetail.url).__biz + '==',
                     token,
                     data,
-                    wx,
-                    machine_num: wx,
+                    wx: ~~wx,
+                    machine_num: ~~wx,
                 })
             }
 
