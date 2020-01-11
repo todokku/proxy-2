@@ -211,7 +211,7 @@ serverAction.getFindNext = async (wx) => { // 前台页会确保有数据才会�
     // 如果有数据
     let data = result[0]
     let updateResult = await dbAction.updateOne('find', { // 更新当前数据为 已完成 状态
-        unique: data.unique
+        _id: data._id
     }, {
         finish: 1
     }).catch(err => console.log('更新find数据库失败', err))
@@ -332,8 +332,6 @@ serverAction.sendReadLike = async (wx) => {
 
     }, 10000) // 10秒后发送数据 （确保最后一条写入数据库了
 }
-
-
 
 serverAction.sendFindSingle = async (sendDATA, wx, i = 0) => {
 
