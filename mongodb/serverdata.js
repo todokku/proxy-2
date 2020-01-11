@@ -181,7 +181,7 @@ serverAction.getReadLikeNext = async (wx) => { // 前台页会确保有数据才
     // 如果有数据
     let data = readLikeDATA[0]
     let updateResult = await dbAction.updateOne('readlike', { // 更新当前数据为 已完成 状态
-        unique: data.unique
+        _id: data._id
     }, {
         finish: 1
     }).catch(err => ({
@@ -357,11 +357,6 @@ serverAction.sendFindSingle = async (sendDATA, wx, i = 0) => {
         }).catch(err => console.log('数据库写入错误'))
     }
 
-    let updateResult = await dbAction.updateOne('handlefind', { // 更新当前数据为 已完成 状态
-        _id: sendDATA[i]._id
-    }, {
-        sended: true
-    }).catch(err => console.log('更新handlefind数据库失败', err))
     if (i >= sendDATA.length - 1) {
         return true
     } else {
@@ -372,7 +367,7 @@ serverAction.sendFindSingle = async (sendDATA, wx, i = 0) => {
 serverAction.sendFind = async (wx) => {
     setTimeout(async () => {
         let data = await dbAction.find('handlefind', { // 获取还未发送到所有数据
-            wx: '' + wx,
+            wx: wx,
             sended: {
                 $exists: false
             }
@@ -456,17 +451,14 @@ serverAction.sendFind = async (wx) => {
         //         }).catch(err => console.log('数据库写入错误'))
         //     }
         // }
-
-
-
-        // var updateHandleFind = await dbAction.updateMany('handlefind', {
-        //     wx,
-        //     _id: {
-        //         $lte: data[data.length - 1]._id
-        //     },
-        // }, {
-        //     sended: true
-        // }).catch(err => console.log('更新handlefind数据库失败', err))
+        var updateHandleFind = await dbAction.updateMany('handlefind', {
+            wx,
+            _id: {
+                $lte: data[data.length - 1]._id
+            },
+        }, {
+            sended: true
+        }).catch(err => console.log('更新handlefind数据库失败', err))
 
     }, 10000) // 10秒后发送数据 （确保最后一条写入数据库了
 
