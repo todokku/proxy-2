@@ -322,6 +322,7 @@ serverAction.sendReadLike = async (wx) => {
         await serverAction.sendReadLikeSingle(sendDATA, type, wx)
 
         let updateHandleReadLike = await dbAction.updateMany('handlereadlike', {
+            wx,
             _id: {
                 $lte: data[data.length - 1]._id
             },
@@ -421,6 +422,7 @@ serverAction.sendFind = async (wx) => {
         }
 
         var updateHandleFind = await dbAction.updateMany('handlefind', {
+            wx,
             _id: {
                 $lte: data[data.length - 1]._id
             },
