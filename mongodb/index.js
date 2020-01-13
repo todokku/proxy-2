@@ -1,7 +1,7 @@
 var MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 var dbURL = 'mongodb://localhost:27017';
-const dbName = 'wx';
+const dbName = 'wx2';
 
 var mongodb;
 
