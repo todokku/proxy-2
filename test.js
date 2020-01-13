@@ -4,38 +4,25 @@ const serverAction = require('./mongodb/serverdata')
 var helper = require('./util/helper')
 
 
-async function test(wx, num) {
-    let info = await dbAction.findOne('wx', {
-        wx: ~~wx,
-    }).catch(err => console.log('获取wx数据库失败', err))
+async function test(wx) {
 
-    let exact = info.exact
-    let newaccount = info.new
-    num = newaccount ? 20 : num
-    let url_type = exact ? 'exactArticle' : 'articleLinks'
+    // let sb = await dbAction.deleteMany('readlike', {
+    //     order_id: {
+    //         $in: [6755, 6824, 6786]
+    //     }
+    // })
 
-    let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/${url_type}?machine_num=${wx}&limit_num=${num}`).catch(async err => {
-        return await serverAction.recordErrNet(err, 'getReadLikeAll').catch(err => ({
-            error: true
-        }))
-    })
+    // console.log(sb.result)
 
-    if (resDATA.error) return ({
-        nothing: true
-    })
 
-    console.log(resDATA.status, resDATA.data, 'res')
+    await dbAction.updateMany('readlike', {
+        wx,
+    }, {
+        finish: 1
+    }).catch(async err => console.log('重设标志为未完成失败'))
 
-    if (!resDATA.error) {
-        // 记录发送数据结果
-        await dbAction.insertOne('send_net', {
-            time: helper.nowDATE(),
-            wx,
-            type: 'getFindReadLike',
-            resdata: resDATA.data,
-            resstatus: resDATA.status,
-        }).catch(err => console.log(err, '数据库写入错误'))
-    }
+
+
 }
 
-test(28, 60)
+test(7)

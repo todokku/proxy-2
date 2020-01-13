@@ -154,9 +154,7 @@ router.get('/readlike', async function (req, res, next) {
 
         let readLikeDATA = await dbAction.find('readlike', { // 如果此微信有数据(直接获取是否有未完成的数据，不同于find需要比较久的时间等待哦)
             wx,
-            finish: {
-                $exists: false
-            }
+            finish: 0
         }).catch(err => console.log('查询readlike数据库失败', err))
 
         type = readLikeDATA.length ? 'canNext' : 'nothing'

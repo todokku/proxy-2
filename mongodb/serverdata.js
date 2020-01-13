@@ -28,9 +28,6 @@ serverAction.recordErrNet = async (err, type) => {
     })
 }
 
-
-
-
 serverAction.recordErrDb = async (data) => {
     await dbAction.insertOne('error_net', Object.assign({
         time: helper.nowDATE(),
@@ -81,9 +78,23 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
         wx: ~~wx,
     }).catch(err => console.log('获取wx数据库失败', err))
 
-    let exact = info.exact
-    let newaccount = info.new
-    num = newaccount ? 20 : num
+    let readlike = await dbAction.findAll('readlike', {
+        wx
+    })
+    let over2 = 0
+    if (readlike.length) {
+        readlike.map(data => {
+            let pastTime = (+new Date(data.handle_time) - +new Date(data.get_time)) / 1000 // 秒
+            if (pastTime >= 7200) over2 += 1 //如果超过2小时的 +1
+            if (data.del) over2 += 1 // 如果文章违规删文等
+        })
+    }
+
+    over2 = over2 > 180 ? 180 : over2
+
+    let exact = !!info ? info.exact : 0
+    let newaccount = !!info ? info.new : 20
+    num = newaccount ? 20 : num + over2
     let url_type = exact ? 'exactArticle' : 'articleLinks'
 
     let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/${url_type}?machine_num=${wx}&limit_num=${num}`).catch(async err => {
@@ -91,11 +102,9 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
             error: true
         }))
     })
-
     if (resDATA.error) return ({
         nothing: true
     })
-
     if (!resDATA.error) {
         // 记录发送数据结果
         await dbAction.insertOne('send_net', {
@@ -107,18 +116,76 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
         }).catch(err => console.log('数据库写入错误'))
     }
 
-
     let LinkDATA = resDATA.data.data
-    if (!LinkDATA.length) return ({ // 如果请求失败，或者数据为空，都让前台处理
-        nothing: true,
-    })
-    LinkDATA.map(item => (item.wx = wx, item.gettime = helper.nowDATE()))
-    let result = await dbAction.insertMany('readlike', LinkDATA).catch(err => (console.log(err), {
-        result: {
-            ok: 0
+    if (!LinkDATA.length) { // 如果数据为空，都让前台处理
+        await dbAction.remove('readlike', {}).catch(async err => console.log(err, '清空数据出错'))
+        return ({
+            nothing: true,
+        })
+    }
+
+    // 如果数据库的order_id不在当前次的数据中的话， 则删除
+    let prevReadLikeData = await dbAction.findAll('readlike', {})
+    let waitDelOrderIds = []
+    let waitDelOrderIdsForRecord = []
+    if (prevReadLikeData.length) {
+        for (let i = 0; i <= prevReadLikeData.length - 1; i++) {
+            let prdOne = prevReadLikeData[i];
+            let hasPrdOneData = LinkDATA.find(item => item.order_id == prdOne.order_id)
+            if (!hasPrdOneData) {
+                waitDelOrderIds.push(item.order_id)
+                waitDelOrderIdsForRecord.push({
+                    order_id: item.order_id,
+                    wx,
+                    time: helper.nowDATE(),
+                })
+            }
         }
-    }))
-    return result.result
+        if (waitDelOrderIds.length) {
+            let delOldDatas = await dbAction.deleteMany('readlike', {
+                order_id: {
+                    $in: waitDelOrderIds
+                }
+            }).catch(async err => console.log(err, '删除上一条数据失败'))
+            let recordDelData = await dbAction.insertMany('del_prev_readlike', waitDelOrderIdsForRecord).catch(err => console.log(err, '记录删除上一条数据失败'))
+        }
+        return await serverAction.writeReadLikeDB(wx, LinkDATA)
+    } else {
+        return await serverAction.writeReadLikeDB(wx, LinkDATA)
+    }
+}
+
+serverAction.writeReadLikeDB = async (wx, data, i = 0) => {
+    let dataOne = data[i]
+    dataOne.wx = wx
+
+    dataOne.finish = 0
+    let hasData = await dbAction.findOne('readlike', {
+        order_id: dataOne.order_id
+    }).catch(async err => console.log('查询失败'))
+
+    if (hasData === null) { // 如果没找到对应数据
+        await dbAction.findOneAndUpdate('readlike', {
+            order_id: dataOne.order_id,
+        }, Object.assign(dataOne, {
+            get_time: helper.nowDATE(),
+            update_time: helper.nowDATE()
+        }))
+    } else {
+        await dbAction.findOneAndUpdate('readlike', {
+            order_id: dataOne.order_id,
+        }, {
+            update_time: helper.nowDATE()
+        })
+    }
+    if (i >= data.length - 1) {
+        return ({
+            ok: true
+        })
+    } else {
+        return await serverAction.writeReadLikeDB(wx, data, i + 1)
+    }
+    // if (hasData.result)
 }
 
 
@@ -129,7 +196,6 @@ serverAction.getOne = async (table, query) => {
     let result = await dbAction.findOne(table, query)
     return result
 }
-
 
 
 /**
@@ -165,33 +231,56 @@ serverAction.getReadLikeNext = async (wx) => { // 前台页会确保有数据才
     // 是否还有待抓取的数据
     let readLikeDATA = await dbAction.find('readlike', {
         wx,
-        finish: {
-            $exists: false
-        }
+        finish: 0
     }).catch(err => console.log('查询readlike数据库失败', err))
 
     // 没有更多数据了
     if (!readLikeDATA.length) {
+
+        await dbAction.updateMany('readlike', {
+            wx,
+        }, {
+            finish: 0
+        }).catch(async err => console.log('重设标志为未完成失败'))
+
         serverAction.sendReadLike(wx)
         return ({ // 如果是24小时的
             timeout: true
         })
     }
-
     // 如果有数据
     let data = readLikeDATA[0]
+
+    if (data.handle_time) { // 如果存在handle_time(有抓过)
+        let pastTime = (+new Date(data.handle_time) - +new Date(data.get_time)) / 1000 // 秒
+        if (pastTime >= 7200) { // 如果超过两个小时了
+            if (+new Date - +new Date(data.handle_time) < 1800) { // 如果没有超过30分钟
+                await dbAction.updateOne('readlike', { // 更新当前数据为 已完成 状态
+                    _id: data._id
+                }, {
+                    finish: 1,
+                }).catch(err => {
+                    console.log(err, '更新finish标志失败')
+                    return ({
+                        error: true
+                    })
+                })
+                return await serverAction.getReadLikeNext(wx) // 则跳过取下一个
+            }
+        }
+    }
+
     let updateResult = await dbAction.updateOne('readlike', { // 更新当前数据为 已完成 状态
         _id: data._id
     }, {
-        finish: 1
+        finish: 1,
+        handle_time: helper.nowDATE()
     }).catch(err => ({
         error: true
     }))
-
-    if (!data.order_id || !data.msgid || !data.promotion_url) {
+    if (data.del || !data.order_id || !data.msgid || !data.promotion_url) {
         return await serverAction.getReadLikeNext(wx)
     }
-
     return data
 }
 

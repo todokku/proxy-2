@@ -154,12 +154,27 @@ dbAction.find = async (collectionName, query) => {
 
 
 
-dbAction.findOne = async (collectionName, query, ) => {
+dbAction.findOne = async (collectionName, query) => {
     if (!mongodb) await connect()
     const db = mongodb.db(dbName)
     const collection = db.collection(collectionName)
     return await new Promise((resolve, reject) => {
         collection.findOne(query, (err, result) => {
+            if (err) reject(err)
+            if (!err) resolve(result)
+        })
+    })
+}
+dbAction.findAndModify = async (collectionName, query, update) => {
+    if (!mongodb) await connect()
+    const db = mongodb.db(dbName)
+    const collection = db.collection(collectionName)
+    return await new Promise((resolve, reject) => {
+        collection.findAndModify({
+            query,
+            update,
+            upsert: true,
+        }, (err, result) => {
             if (err) reject(err)
             if (!err) resolve(result)
         })
@@ -181,6 +196,7 @@ dbAction.findOneLast = async (collectionName, query, ) => {
 }
 
 
+// 草， findone 没找到就 insert， 然后在 update...
 dbAction.findOneAndUpdate = async (collectionName, query, update) => {
     if (!mongodb) await connect()
     const db = mongodb.db(dbName)
@@ -197,13 +213,43 @@ dbAction.findOneAndUpdate = async (collectionName, query, update) => {
     })
 }
 
+
+
 dbAction.findAll = async (collectionName, query) => {
-    let q = query ? query: {}
+    let q = query ? query : {}
+    if (!mongodb) await connect();
+    const db = mongodb.db(dbName);
+    const collection = db.collection(collectionName);
+
+    return await new Promise((resolve, reject) => {
+        collection.find(q).toArray((err, result) => {
+            if (err) reject(err)
+            if (!err) resolve(result)
+        })
+    })
+}
+
+
+dbAction.remove = async (collectionName, query) => {
+    let q = query ? query : {}
     if (!mongodb) await connect();
     const db = mongodb.db(dbName);
     const collection = db.collection(collectionName);
     return await new Promise((resolve, reject) => {
-        collection.find(q).toArray((err, result) => {
+        collection.remove(q, (err, result) => {
+            if (err) reject(err)
+            if (!err) resolve(result)
+        })
+    })
+}
+
+dbAction.deleteMany = async (collectionName, query) => {
+    let q = query ? query : {}
+    if (!mongodb) await connect();
+    const db = mongodb.db(dbName);
+    const collection = db.collection(collectionName);
+    return await new Promise((resolve, reject) => {
+        collection.deleteMany(q, (err, result) => {
             if (err) reject(err)
             if (!err) resolve(result)
         })

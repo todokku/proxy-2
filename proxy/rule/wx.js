@@ -148,6 +148,16 @@ module.exports = {
                     error: reason, // 文章更新失败的原因
                     time: helper.nowDATE(), // 本次更新时间
                 })
+
+                // 打上标志
+                dbAction.updateOne('readlike', {
+                    wx,
+                    order_id: ~~query.order_id,
+                }, {
+                    del: 1
+                }).catch(async err => console.log(err, 'wx内打标志错误'))
+
+
                 if (reason == '操作频繁，请稍候再试' || reason == '访问过于频繁，请用微信扫描二维码进行访问') { // 如果操作频繁。就返回错误，表示此微信也不可用
                     return new Promise(async (resolve, reject) => {
                         await serverAction.getReadLikeAll(wx, 0).catch(err => console.log(err)) // 回收资源
