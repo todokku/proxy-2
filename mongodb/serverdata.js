@@ -133,9 +133,9 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
             let prdOne = prevReadLikeData[i];
             let hasPrdOneData = LinkDATA.find(item => item.order_id == prdOne.order_id)
             if (!hasPrdOneData) {
-                waitDelOrderIds.push(item.order_id)
+                waitDelOrderIds.push(prdOne.order_id)
                 waitDelOrderIdsForRecord.push({
-                    order_id: item.order_id,
+                    order_id: prdOne.order_id,
                     wx,
                     time: helper.nowDATE(),
                 })
@@ -254,7 +254,7 @@ serverAction.getReadLikeNext = async (wx) => { // 前台页会确保有数据才
     if (data.handle_time) { // 如果存在handle_time(有抓过)
         let pastTime = (+new Date(data.handle_time) - +new Date(data.get_time)) / 1000 // 秒
         if (pastTime >= 7200) { // 如果超过两个小时了
-            if (+new Date - +new Date(data.handle_time) < 1800) { // 如果没有超过30分钟
+            if ((+new Date - +new Date(data.handle_time)) / 1000 < 1800) { // 如果没有超过30分钟
                 await dbAction.updateOne('readlike', { // 更新当前数据为 已完成 状态
                     _id: data._id
                 }, {
