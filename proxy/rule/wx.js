@@ -186,12 +186,15 @@ module.exports = {
 
             return new Promise(async (resolve, reject) => {
 
-                // 写入实际发文时间
-                await dbAction.findOneAndUpdate('readlike', {
-                    order_id: ~~query.order_id
-                }, {
-                    ct: ct + 300000, // 多加5分钟，因为推送到用户端会有延迟（不是一发文，用户就能收到
-                }).catch(async err => console.log('写入发文时间失败'))
+                if (~~query.order_id) {
+                    // 写入实际发文时间
+                    await dbAction.findOneAndUpdate('readlike', {
+                        order_id: ~~query.order_id
+                    }, {
+                        ct: ct + 300000, // 多加5分钟，因为推送到用户端会有延迟（不是一发文，用户就能收到
+                    }).catch(async err => console.log('写入发文时间失败'))
+                }
+
 
                 let nextReadLikeDATA = await serverAction.getReadLikeNext(~~wx)
                 if (nextReadLikeDATA.nothing || nextReadLikeDATA.waiting || nextReadLikeDATA.timeout) { // 如果没数据，<del>或者在等待~</del>(因为在过渡页处理了) 就返回前台页面

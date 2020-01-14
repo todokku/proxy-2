@@ -34,10 +34,13 @@ serverAction.recordErrDb = async (data) => {
     }, data))
 }
 
-serverAction.getFindAll = async (wx, num = 8) => {
+serverAction.getFindAll = async (wx, num = 4) => {
 
     // 18-8点: 4 * 14
     // 8-18点：14 * 10
+    let night = [0, 1, 2, 3, 4, 5, 6, 7, 19, 20, 21, 22, 23]
+    let hour = new Date().getHours()
+    num = night.includes(hour) ? 4 : 14
 
     let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}`).catch(async err => {
         return await serverAction.recordErrNet(err, 'getFindAll').catch(err => ({
@@ -54,6 +57,7 @@ serverAction.getFindAll = async (wx, num = 8) => {
         await dbAction.insertOne('send_net', {
             time: helper.nowDATE(),
             wx,
+            num,
             type: 'getFindAll',
             resdata: resDATA.data,
             resstatus: resDATA.status,
