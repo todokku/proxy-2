@@ -166,31 +166,29 @@ serverAction.writeReadLikeDB = async (wx, data, i = 0) => {
     let dataOne = data[i]
     dataOne.wx = wx
     dataOne.finish = 0
-    dataOne.update_time = helper.nowDATE()
 
+    let hasData = await dbAction.findOne('readlike', {
+        order_id: dataOne.order_id
+    }).catch(async err => console.log('查询失败'))
 
-    // let hasData = await dbAction.findOne('readlike', {
-    //     order_id: dataOne.order_id
-    // }).catch(async err => console.log('查询失败'))
+    if (hasData === null) { // 如果没找到对应数据
+        await dbAction.findOneAndUpdate('readlike', {
+            order_id: dataOne.order_id,
+        }, Object.assign(dataOne, {
+            get_time: helper.nowDATE(),
+            update_time: helper.nowDATE()
+        }))
+    } else {
+        await dbAction.findOneAndUpdate('readlike', {
+            order_id: dataOne.order_id,
+        }, {
+            update_time: helper.nowDATE()
+        })
+    }
 
-    // if (hasData === null) { // 如果没找到对应数据
-    //     await dbAction.findOneAndUpdate('readlike', {
-    //         order_id: dataOne.order_id,
-    //     }, Object.assign(dataOne, {
-    //         get_time: helper.nowDATE(),
-    //         update_time: helper.nowDATE()
-    //     }))
-    // } else {
-    //     await dbAction.findOneAndUpdate('readlike', {
-    //         order_id: dataOne.order_id,
-    //     }, {
-    //         update_time: helper.nowDATE()
-    //     })
-    // }
-
-    await dbAction.findOneAndUpdate('readlike', {
-        order_id: dataOne.order_id,
-    }, dataOne)
+    // await dbAction.findOneAndUpdate('readlike', {
+    //     order_id: dataOne.order_id,
+    // }, dataOne)
 
 
 
