@@ -54,7 +54,7 @@ serverAction.getFindAll = async (wx, num = 4) => {
 
     if (!resDATA.error) {
         // 记录发送数据结果
-        await dbAction.insertOne('send_net', {
+        await dbAction.insertOne('get_net', {
             time: helper.nowDATE(),
             wx,
             num,
@@ -116,7 +116,7 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
     })
     if (!resDATA.error) {
         // 记录发送数据结果
-        await dbAction.insertOne('send_net', {
+        await dbAction.insertOne('get_net', {
             time: helper.nowDATE(),
             wx,
             type: 'getFindReadLike',
