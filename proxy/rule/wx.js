@@ -117,6 +117,8 @@ module.exports = {
         if (requestDetail.url.indexOf("mp.weixin.qq.com/s") != -1) {
             let wx = ~~helper.postDATA(requestDetail.url).wx
             let resContent = newResponse.body.toString("utf-8")
+            var ct = +new Date
+
             if (newResponse.header['Content-Security-Policy']) {
                 nonce = newResponse.header['Content-Security-Policy'].match(/nonce-\d+/g)[0].split('-')[1]
             }
@@ -176,7 +178,21 @@ module.exports = {
 
             }
 
+            if (resContent.indexOf('var ct') != -1) {
+                ct = /var ct = "(.*)";/.exec(resContent)[1] // 发文时间
+                ct = ~~ct * 1000
+            }
+
+
             return new Promise(async (resolve, reject) => {
+
+                // 写入实际发文时间
+                await dbAction.findOneAndUpdate('readlike', {
+                    order_id: ~~query.order_id
+                }, {
+                    ct: ct + 300000, // 多加5分钟，因为推送到用户端会有延迟（不是一发文，用户就能收到
+                }).catch(async err => console.log('写入发文时间失败'))
+
                 let nextReadLikeDATA = await serverAction.getReadLikeNext(~~wx)
                 if (nextReadLikeDATA.nothing || nextReadLikeDATA.waiting || nextReadLikeDATA.timeout) { // 如果没数据，<del>或者在等待~</del>(因为在过渡页处理了) 就返回前台页面
                     let action = ''

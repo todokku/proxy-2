@@ -35,6 +35,10 @@ serverAction.recordErrDb = async (data) => {
 }
 
 serverAction.getFindAll = async (wx, num = 8) => {
+
+    // 18-8点: 4 * 14
+    // 8-18点：14 * 10
+
     let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}`).catch(async err => {
         return await serverAction.recordErrNet(err, 'getFindAll').catch(err => ({
             error: true
@@ -74,6 +78,7 @@ serverAction.getFindAll = async (wx, num = 8) => {
 
 serverAction.getReadLikeAll = async (wx, num = 60) => {
 
+
     let info = await dbAction.findOne('wx', {
         wx: ~~wx,
     }).catch(err => console.log('获取wx数据库失败', err))
@@ -90,7 +95,7 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
         })
     }
 
-    over2 = over2 > 180 ? 180 : over2
+    over2 = over2 > 120 ? 120 : over2
 
     let exact = !!info ? info.exact : 0
     let newaccount = !!info ? info.new : 20
@@ -111,6 +116,7 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
             time: helper.nowDATE(),
             wx,
             type: 'getFindReadLike',
+            num,
             resdata: resDATA.data,
             resstatus: resDATA.status,
         }).catch(err => console.log('数据库写入错误'))
@@ -155,29 +161,39 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
     }
 }
 
+
 serverAction.writeReadLikeDB = async (wx, data, i = 0) => {
     let dataOne = data[i]
     dataOne.wx = wx
-
     dataOne.finish = 0
-    let hasData = await dbAction.findOne('readlike', {
-        order_id: dataOne.order_id
-    }).catch(async err => console.log('查询失败'))
+    dataOne.update_time = helper.nowDATE()
 
-    if (hasData === null) { // 如果没找到对应数据
-        await dbAction.findOneAndUpdate('readlike', {
-            order_id: dataOne.order_id,
-        }, Object.assign(dataOne, {
-            get_time: helper.nowDATE(),
-            update_time: helper.nowDATE()
-        }))
-    } else {
-        await dbAction.findOneAndUpdate('readlike', {
-            order_id: dataOne.order_id,
-        }, {
-            update_time: helper.nowDATE()
-        })
-    }
+
+    // let hasData = await dbAction.findOne('readlike', {
+    //     order_id: dataOne.order_id
+    // }).catch(async err => console.log('查询失败'))
+
+    // if (hasData === null) { // 如果没找到对应数据
+    //     await dbAction.findOneAndUpdate('readlike', {
+    //         order_id: dataOne.order_id,
+    //     }, Object.assign(dataOne, {
+    //         get_time: helper.nowDATE(),
+    //         update_time: helper.nowDATE()
+    //     }))
+    // } else {
+    //     await dbAction.findOneAndUpdate('readlike', {
+    //         order_id: dataOne.order_id,
+    //     }, {
+    //         update_time: helper.nowDATE()
+    //     })
+    // }
+
+    await dbAction.findOneAndUpdate('readlike', {
+        order_id: dataOne.order_id,
+    }, dataOne)
+
+
+
     if (i >= data.length - 1) {
         return ({
             ok: true
@@ -187,7 +203,6 @@ serverAction.writeReadLikeDB = async (wx, data, i = 0) => {
     }
     // if (hasData.result)
 }
-
 
 /**
  * 获取单条数据
@@ -251,9 +266,9 @@ serverAction.getReadLikeNext = async (wx) => { // 前台页会确保有数据才
     // 如果有数据
     let data = readLikeDATA[0]
 
-    if (data.handle_time) { // 如果存在handle_time(有抓过)
-        let pastTime = (+new Date(data.handle_time) - +new Date(data.get_time)) / 1000 // 秒
-        if (pastTime >= 7200) { // 如果超过两个小时了
+    if (data.ct) { // 如果存在ct(有抓过， 然后有发文时间了)
+        let pastTime = (+new Date - +new Date(data.ct)) / 1000 // 秒
+        if (pastTime >= 7200) { // 如果发文超过两个小时了
             if ((+new Date - +new Date(data.handle_time)) / 1000 < 1800) { // 如果没有超过30分钟
                 await dbAction.updateOne('readlike', { // 更新当前数据为 已完成 状态
                     _id: data._id
@@ -380,7 +395,8 @@ serverAction.sendReadLike = async (wx) => {
         let info = await dbAction.findOne('wx', {
             wx: ~~wx
         }).catch(err => console.log('获取wx数据库失败', err))
-        let exact = info.exact
+
+        let exact = !!info ? info.exact : 0
         let type = exact ? 3 : 1
 
         // for (var i = 0; i < sendDATA.length; i++) {
