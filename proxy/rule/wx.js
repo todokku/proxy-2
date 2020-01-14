@@ -130,15 +130,18 @@ module.exports = {
             if (resContent.indexOf('此帐号已被屏蔽, 内容无法查看') != -1) reason = '此帐号已被屏蔽, 内容无法查看'
             let query = helper.postDATA(requestDetail.url)
             if (reason != '') {
-                dbAction.insertOne('error_wx', {
-                    time: helper.nowDATE(),
-                    type: 'readlike',
-                    wx,
-                    reason,
-                })
+                // dbAction.insertOne('error_wx', {
+                //     time: helper.nowDATE(),
+                //     type: 'readlike',
+                //     order_id: ~~query.order_id,
+                //     wx,
+                //     reason,
+                // })
                 if (reason == '此内容因违规无法查看') {
+
                     // var getReason = resContent.match(/<p class="tips">(.*)<a/)[1].match(/[\u2E80-\u9FFF]+/g)
                     // reason += '，原因：' + getReason.slice(1, getReason.length - 1).join('或')
+
                     reason += '，原因：' + resContent.match(/<p class="tips">(.*)<a/)[1].replace('，查看', '')
                 }
                 dbAction.insert('handlereadlike', {
@@ -182,7 +185,6 @@ module.exports = {
                 ct = /var ct = "(.*)";/.exec(resContent)[1] // 发文时间
                 ct = ~~ct * 1000
             }
-
 
             return new Promise(async (resolve, reject) => {
 
