@@ -82,9 +82,10 @@ serverAction.getFindAll = async (wx, num = 4) => {
 
 serverAction.getReadLikeAll = async (wx, num = 60) => {
 
+    wx = ~~wx
 
     let info = await dbAction.findOne('wx', {
-        wx: ~~wx,
+        wx,
     }).catch(err => console.log('获取wx数据库失败', err))
 
     let readlike = await dbAction.findAll('readlike', {
@@ -93,7 +94,7 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
     let over2 = 0
     if (readlike.length) {
         readlike.map(data => {
-            let pastTime = (+new Date(data.handle_time) - +new Date(data.get_time)) / 1000 // 秒
+            let pastTime = (+new Date(data.handle_time) - data.ct) / 1000 // 秒
             if (pastTime >= 7200) over2 += 1 //如果超过2小时的 +1
             if (data.del) over2 += 1 // 如果文章违规删文等
         })
@@ -128,14 +129,18 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
 
     let LinkDATA = resDATA.data.data
     if (!LinkDATA.length) { // 如果数据为空，都让前台处理
-        await dbAction.remove('readlike', {}).catch(async err => console.log(err, '清空数据出错'))
+        await dbAction.remove('readlike', {
+            wx
+        }).catch(async err => console.log(err, '清空数据出错'))
         return ({
             nothing: true,
         })
     }
 
     // 如果数据库的order_id不在当前次的数据中的话， 则删除
-    let prevReadLikeData = await dbAction.findAll('readlike', {})
+    let prevReadLikeData = await dbAction.findAll('readlike', {
+        wx
+    })
     let waitDelOrderIds = []
     let waitDelOrderIdsForRecord = []
     if (prevReadLikeData.length) {
@@ -153,6 +158,7 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
         }
         if (waitDelOrderIds.length) {
             let delOldDatas = await dbAction.deleteMany('readlike', {
+                wx,
                 order_id: {
                     $in: waitDelOrderIds
                 }
@@ -172,11 +178,13 @@ serverAction.writeReadLikeDB = async (wx, data, i = 0) => {
     dataOne.finish = 0
 
     let hasData = await dbAction.findOne('readlike', {
+        wx,
         order_id: dataOne.order_id
     }).catch(async err => console.log('查询失败'))
 
     if (hasData === null) { // 如果没找到对应数据
         await dbAction.findOneAndUpdate('readlike', {
+            wx,
             order_id: dataOne.order_id,
         }, Object.assign(dataOne, {
             get_time: helper.nowDATE(),
@@ -184,6 +192,7 @@ serverAction.writeReadLikeDB = async (wx, data, i = 0) => {
         }))
     } else {
         await dbAction.findOneAndUpdate('readlike', {
+            wx,
             order_id: dataOne.order_id,
         }, {
             update_time: helper.nowDATE()
