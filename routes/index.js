@@ -9,6 +9,7 @@ router.get('/find', async function (req, res, next) {
     let action = req.query.action
     let wx = ~~req.query.wx
     let newaccount = ~~req.query.new
+    let follow = ~~req.query.follow ? 2 : 1
     let nextLink = {}
     let timeout = false
 
@@ -26,6 +27,7 @@ router.get('/find', async function (req, res, next) {
         let updateDATA = {
             new: newaccount,
             wx,
+            follow,
             type: 'find',
             pid: null
         }
@@ -73,7 +75,7 @@ router.get('/find', async function (req, res, next) {
     }
 
     if (action && action == 'nothing') { // 如果是没数据的情况
-        var findDATA = await serverAction.getFindAll(wx).catch(err => console.log('查询find数据库失败', err)) // 获取下一轮数据
+        var findDATA = await serverAction.getFindAll(wx, follow).catch(err => console.log('查询find数据库失败', err)) // 获取下一轮数据
 
         if (!findDATA.nothing || findDATA.ok) {
             nextLink = await serverAction.getFindNext(wx).catch(err => console.log('查询find数据库失败', err))

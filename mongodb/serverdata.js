@@ -34,7 +34,7 @@ serverAction.recordErrDb = async (data) => {
     }, data))
 }
 
-serverAction.getFindAll = async (wx, num = 4) => {
+serverAction.getFindAll = async (wx, follow, num = 4) => {
 
     // 18-8点: 4 * 14
     // 8-18点：14 * 10
@@ -42,7 +42,7 @@ serverAction.getFindAll = async (wx, num = 4) => {
     let hour = new Date().getHours()
     num = night.includes(hour) ? 4 : 14
 
-    let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}`).catch(async err => {
+    let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}&follow=${follow}`).catch(async err => {
         return await serverAction.recordErrNet(err, 'getFindAll').catch(err => ({
             error: true
         }))
