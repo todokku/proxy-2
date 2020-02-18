@@ -1,6 +1,6 @@
 
 http://127.0.0.1/find?wx=1  // 首页
-http://127.0.0.1/find?new=1&wx=1  // 首页 - 新账号
+http://127.0.0.1/find?follow=2&wx=1  // 首页 - 已关注
 
 http://127.0.0.1/readlike?wx=1 // 阅读数
 http://127.0.0.1/readlike?new=1&wx=1 // 阅读数 - 新账号
