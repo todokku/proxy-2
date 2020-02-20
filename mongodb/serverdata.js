@@ -38,9 +38,19 @@ serverAction.getFindAll = async (wx, follow, num = 4) => {
 
     // 18-8点: 4 * 14
     // 8-18点：14 * 10
-    let night = [0, 1, 2, 3, 4, 5, 6, 7, 19, 20, 21, 22, 23]
+    // let night = [0, 1, 2, 3, 4, 5, 6, 7, 19, 20, 21, 22, 23]
+    // num = night.includes(hour) ? 4 : 14
+
+    // 0-5  4
+    // 6-11 18
+    // 12-17 8
+    // 18-23 3
     let hour = new Date().getHours()
-    num = night.includes(hour) ? 4 : 14
+    if (hour >= 0 && hour <= 5) num = 4
+    if (hour >= 6 && hour <= 11) num = 18
+    if (hour >= 12 && hour <= 17) num = 8
+    if (hour >= 18 && hour <= 23) num = 3
+
 
     let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}&follow=${follow}`).catch(async err => {
         return await serverAction.recordErrNet(err, 'getFindAll').catch(err => ({
