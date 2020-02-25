@@ -21,6 +21,12 @@ process.processing = () => {
         // 否则，有wxInfo数据必然有pid（因为必须通过登录微信打开相应的链接才会写入wxInfo数据
         exec('tasklist | findstr "WeChatApp"', async (err, stdout) => {
             if (err) { // 全部掉线
+
+                await dbAction.insertOne('crash_wx', {
+                    type: 'all',
+                    time: helper.nowDATE(),
+                })
+
                 clearInterval(timer) //
                 let wxDATA = await dbAction.findAll('wx')
                 wxDATA.map(async item => {
@@ -61,6 +67,13 @@ process.processing = () => {
                 wxDATA.map(async item => {
                     if (item.pid) {
                         if (!pids.includes(item.pid)) {
+
+                            await dbAction.insertOne('crash_wx', {
+                                type: 'one',
+                                wx: item.wx,
+                                time: helper.nowDATE(),
+                            })
+
                             item.pid = null
                             // 发送短信。告知掉线了
                             await dbAction.findOneAndUpdate('wx', {
