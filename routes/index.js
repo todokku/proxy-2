@@ -24,6 +24,12 @@ router.get('/find', async function (req, res, next) {
 
     if (!action) { // 第一次进入(包含关掉页面重新点击链接进入)
 
+        // 先判断下监听微信是否在线 的进程还在不在跑
+        let hasProcess = await dbAction.findOneAndDelete('crash_wx', { type: 'all' }).catch(err => console.log('获取进程情况失败'))
+        if (hasProcess.value != null) { // value不为空，这表示有这条数据，
+            process.processing()
+        }
+
         let updateDATA = {
             new: newaccount,
             wx,
@@ -139,6 +145,12 @@ router.get('/readlike', async function (req, res, next) {
             type: 'readlike',
             exact,
             pid: null
+        }
+
+        // 先判断下监听微信是否在线 的进程还在不在跑
+        let hasProcess = await dbAction.findOneAndDelete('crash_wx', { type: 'all' }).catch(err => console.log('获取进程情况失败'))
+        if (hasProcess.value != null) { // value不为空，这表示有这条数据，
+            process.processing()
         }
 
         // 删除pid

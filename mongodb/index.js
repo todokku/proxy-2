@@ -13,7 +13,7 @@ function connect() {
             if (err) {
                 console.log(`
                 
-                --- mongodb 连接失败 ${ err } ---
+                --- mongodb 连接失败 ${ err} ---
                 
                 `)
                 reject(err)
@@ -153,7 +153,7 @@ dbAction.find = async (collectionName, query) => {
 }
 
 
-
+// return => null / {}
 dbAction.findOne = async (collectionName, query) => {
     if (!mongodb) await connect()
     const db = mongodb.db(dbName)
@@ -212,6 +212,21 @@ dbAction.findOneAndUpdate = async (collectionName, query, update) => {
         })
     })
 }
+
+
+// return => { value, ok: 1 }
+dbAction.findOneAndDelete = async (collectionName, query) => {
+    if (!mongodb) await connect()
+    const db = mongodb.db(dbName)
+    const collection = db.collection(collectionName)
+    return await new Promise((resolve, reject) => {
+        collection.findOneAndDelete(query, (err, result) => {
+            if (err) reject(err)
+            if (!err) resolve(result)
+        })
+    })
+}
+
 
 
 

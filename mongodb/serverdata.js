@@ -45,6 +45,13 @@ serverAction.getFindAll = async (wx, follow, num = 4) => {
     // 6-11 18
     // 12-17 8
     // 18-23 3
+
+    // TODO
+    // 凌晨0点到6点，每小时监控4个公众号，
+    // 早上6点到12点整，每半小时监控10个公众号，
+    // 12点整到下午6点整，每小时监控6个公众号，
+    // 下午6点到晚上12点整，每小时监控3个公众号
+
     let hour = new Date().getHours()
     if (hour >= 0 && hour <= 5) num = 4
     if (hour >= 6 && hour <= 11) num = 18
@@ -66,6 +73,7 @@ serverAction.getFindAll = async (wx, follow, num = 4) => {
         // 记录发送数据结果
         await dbAction.insertOne('get_net', {
             time: helper.nowDATE(),
+            _st: +new Date,
             wx,
             num,
             type: 'getFindAll',
@@ -163,6 +171,7 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
                     order_id: prdOne.order_id,
                     wx,
                     time: helper.nowDATE(),
+                    _st: +new Date,
                 })
             }
         }
@@ -363,6 +372,7 @@ serverAction.sendReadLikeSingle = async (sendDATA, type, wx, i = 0) => {
     if (!result.error) { // 记录发送数据结果
         await dbAction.insertOne('send_net', {
             time: helper.nowDATE(),
+            _st: +new Date,
             wx,
             senddata: sendDATA[i],
             type: 'sendReadLike',
