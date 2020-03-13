@@ -31,8 +31,8 @@ process.processing = () => {
                 let wxDATA = await dbAction.findAll('wx')
                 wxDATA.map(async item => {
                     if (item.pid) {
-                        if (item.type == 'find') await serverAction.getFindAll(item.wx, 0).catch(err => {})
-                        if (item.type == 'readlike') await serverAction.getReadLikeAll(item.wx, 0).catch(err => {})
+                        if (item.type == 'find') await serverAction.getFindAll(item.wx, 0).catch(err => { })
+                        if (item.type == 'readlike') await serverAction.getReadLikeAll(item.wx, 0).catch(err => { })
 
                         await dbAction.findOneAndUpdate('wx', {
                             wx: item.wx
@@ -42,7 +42,7 @@ process.processing = () => {
 
                         let type = item.exact ? 3 : types[item.type]
 
-                        await axios.get(`https://www.yundiao365.com/crawler/index/gameOver?machine_num=${item.wx}&type=${~~type}`).catch(async err => {
+                        await axios.get(`https://s.yundiao365.com/crawler/index/gameOver?machine_num=${item.wx}&type=${~~type}`).catch(async err => {
                             return await serverAction.recordErrNet(err, 'sendGameOver').catch(err => ({
                                 error: true
                             }))
@@ -84,7 +84,7 @@ process.processing = () => {
 
                             let type = item.exact ? 3 : types[item.type]
 
-                            await axios.get(`https://www.yundiao365.com/crawler/index/gameOver?machine_num=${item.wx}&type=${~~type}`).catch(async err => {
+                            await axios.get(`https://s.yundiao365.com/crawler/index/gameOver?machine_num=${item.wx}&type=${~~type}`).catch(async err => {
                                 return await serverAction.recordErrNet(err, 'sendGameOver').catch(err => ({
                                     error: true
                                 }))

@@ -59,7 +59,7 @@ serverAction.getFindAll = async (wx, follow, num = 4) => {
     if (hour >= 18 && hour <= 23) num = 3
 
 
-    let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}&follow=${follow}`).catch(async err => {
+    let resDATA = await axios.get(`https://s.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}&follow=${follow}`).catch(async err => {
         return await serverAction.recordErrNet(err, 'getFindAll').catch(err => ({
             error: true
         }))
@@ -125,7 +125,7 @@ serverAction.getReadLikeAll = async (wx, num = 60) => {
     num = newaccount ? 20 : num + over2
     let url_type = exact ? 'exactArticle' : 'articleLinks'
 
-    let resDATA = await axios.get(`https://www.yundiao365.com/crawler/index/${url_type}?machine_num=${wx}&limit_num=${num}`).catch(async err => {
+    let resDATA = await axios.get(`https://s.yundiao365.com/crawler/index/${url_type}?machine_num=${wx}&limit_num=${num}`).catch(async err => {
         return await serverAction.recordErrNet(err, 'getReadLikeAll').catch(err => ({
             error: true
         }))
@@ -359,7 +359,7 @@ serverAction.getFindNext = async (wx) => { // 前台页会确保有数据才会�
 
 serverAction.sendReadLikeSingle = async (sendDATA, type, wx, i = 0) => {
 
-    let result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticle', {
+    let result = await axios.post('https://s.yundiao365.com/crawler/index/receiveArticle', {
         type: type,
         machine_num: wx,
         data: [sendDATA[i]]
@@ -431,7 +431,7 @@ serverAction.sendReadLike = async (wx) => {
         let type = exact ? 3 : 1
 
         // for (var i = 0; i < sendDATA.length; i++) {
-        //     let result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticle', {
+        //     let result = await axios.post('https://s.yundiao365.com/crawler/index/receiveArticle', {
         //         type: exact ? 3 : 1,
         //         machine_num: wx,
         //         data: [sendDATA[i]]
@@ -471,7 +471,7 @@ serverAction.sendReadLike = async (wx) => {
 
 serverAction.sendFindSingle = async (sendDATA, wx, i = 0) => {
 
-    var result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticleDetail', {
+    var result = await axios.post('https://s.yundiao365.com/crawler/index/receiveArticleDetail', {
         machine_num: wx,
         data: [sendDATA[i]]
     }).catch(async err => {
@@ -565,7 +565,7 @@ serverAction.sendFind = async (wx) => {
 
 
         // for (var i = 0; i < sendDATA.length; i++) {
-        //     var result = await axios.post('https://www.yundiao365.com/crawler/index/receiveArticleDetail', {
+        //     var result = await axios.post('https://s.yundiao365.com/crawler/index/receiveArticleDetail', {
         //         machine_num: wx,
         //         data: [sendDATA[i]]
         //     }).catch(async err => {

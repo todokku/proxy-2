@@ -50,18 +50,18 @@ module.exports = {
                 })
                 // 释放资源
                 return new Promise(async (resolve, reject) => {
-                    await axios.get(`https://www.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=0`).catch(async err => {
+                    await axios.get(`https://s.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=0`).catch(async err => {
                         return await serverAction.recordErrNet(err, 'getFindAll').catch(err => ({
                             error: true
                         }))
                     })
-                    await axios.get(`https://www.yundiao365.com/crawler/index/gameOver?machine_num=${wx}&type=2`).catch(async err => {
+                    await axios.get(`https://s.yundiao365.com/crawler/index/gameOver?machine_num=${wx}&type=2`).catch(async err => {
                         return await serverAction.recordErrNet(err, 'sendGameOver').catch(err => ({
                             error: true
                         }))
                     })
 
-                    newResponse.body += `<p>停止时间：<font color="red">${ helper.nowDATE() }</font><p>`
+                    newResponse.body += `<p>停止时间：<font color="red">${helper.nowDATE()}</font><p>`
                     resolve({
                         response: newResponse
                     })
@@ -91,8 +91,8 @@ module.exports = {
                                 #top {z-index: 999; position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                             </style>
                             <h2 id='top'>这里是最后一条数据啦。一轮完成啦。</h2>
-                            <script nonce="${ nonce }" type="text/javascript">
-                                setTimeout(() => location.href="http://127.0.0.1/find?action=${action}&wx=${ wx }",  3000) // 3秒后才跳转， 确保抓到数据
+                            <script nonce="${ nonce}" type="text/javascript">
+                                setTimeout(() => location.href="http://127.0.0.1/find?action=${action}&wx=${wx}",  3000) // 3秒后才跳转， 确保抓到数据
                             </script>
                         `
                     resolve({
@@ -102,9 +102,9 @@ module.exports = {
                     let rndTime = helper.rdNum(20, 30) * 1000
                     newResponse.body = `
                         <h1>当前抓取的公众号是: <em> ${helper.postDATA(requestDetail.url).__biz} </em> </h1>
-                        <p><font color="red" id="time">${ rndTime / 1000 }s</font>后抓取下一公众号 ${findDATA.biz} </p>
+                        <p><font color="red" id="time">${ rndTime / 1000}s</font>后抓取下一公众号 ${findDATA.biz} </p>
                         <script type="text/javascript">
-                            window.onload = function() { setTimeout(() => location.href = 'https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=${ findDATA.biz }&scene=124&searchwx=${ wx }#wechat_redirect', ${ rndTime }) }
+                            window.onload = function() { setTimeout(() => location.href = 'https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=${ findDATA.biz}&scene=124&searchwx=${wx}#wechat_redirect', ${rndTime}) }
                         </script>`
                     resolve({
                         response: newResponse
@@ -166,12 +166,12 @@ module.exports = {
                 if (reason == '操作频繁，请稍候再试' || reason == '访问过于频繁，请用微信扫描二维码进行访问') { // 如果操作频繁。就返回错误，表示此微信也不可用
                     return new Promise(async (resolve, reject) => {
                         await serverAction.getReadLikeAll(wx, 0).catch(err => console.log(err)) // 回收资源
-                        await axios.get(`https://www.yundiao365.com/crawler/index/gameOver?machine_num=${wx}&type=1`).catch(async err => {
+                        await axios.get(`https://s.yundiao365.com/crawler/index/gameOver?machine_num=${wx}&type=1`).catch(async err => {
                             return await serverAction.recordErrNet(err, 'sendGameOver').catch(err => ({
                                 error: true
                             }))
                         })
-                        newResponse.body += `<p>停止时间：<font color="red">${ helper.nowDATE() }</font><p>`
+                        newResponse.body += `<p>停止时间：<font color="red">${helper.nowDATE()}</font><p>`
                         resolve({
                             response: newResponse
                         })
@@ -216,8 +216,8 @@ module.exports = {
                             #top {z-index: 999; position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                         </style>
                         <h2 id='top'>这里是最后一条数据啦。一轮完成啦。</h2>
-                        <script nonce="${ nonce }" type="text/javascript">
-                            setTimeout(() => location.href="http://127.0.0.1/readlike?action=${action}&wx=${ wx }",  3000) // 3秒后才返回， 确保这一条拿到数据
+                        <script nonce="${ nonce}" type="text/javascript">
+                            setTimeout(() => location.href="http://127.0.0.1/readlike?action=${action}&wx=${wx}",  3000) // 3秒后才返回， 确保这一条拿到数据
                         </script>
                     `)
                     newResponse.body = bodycontent
@@ -226,7 +226,7 @@ module.exports = {
                     })
                 } else {
 
-                    let nextlink = nextReadLikeDATA['promotion_url'].replace(/amp;/ig, '').replace(/(#rd|#wechat_redirect)/, `&wx=${wx}&order_id=${nextReadLikeDATA.order_id}&unique=${nextReadLikeDATA.unique}&nowtime=${ +new Date }&scene=27#wechat_redirect`)
+                    let nextlink = nextReadLikeDATA['promotion_url'].replace(/amp;/ig, '').replace(/(#rd|#wechat_redirect)/, `&wx=${wx}&order_id=${nextReadLikeDATA.order_id}&unique=${nextReadLikeDATA.unique}&nowtime=${+new Date}&scene=27#wechat_redirect`)
 
                     let bodycontent = newResponse.body.toString("utf-8")
 
@@ -239,8 +239,8 @@ module.exports = {
                             #top {z-index: 999; position: fixed; left: 0; bottom: 0; width: 100%; background: #f00; color: #fff; word-break: break-all; padding: 10px; box-sizing: border-box }
                         </style>
                         <h2 id='top'>下一条链接地址：${nextlink}</h2>
-                        <script nonce="${ nonce }" type="text/javascript">
-                            setTimeout(() => location.href="${ nextlink }", ${ helper.rdNum(9, 10)*1000 })
+                        <script nonce="${ nonce}" type="text/javascript">
+                            setTimeout(() => location.href="${ nextlink}", ${helper.rdNum(9, 10) * 1000})
                         </script>
                     `)
 
