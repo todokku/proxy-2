@@ -1,4 +1,5 @@
 const axios = require('axios')
+var cheerio = require('cheerio')
 var helper = require('../../util/helper')
 var dbAction = require('../../mongodb')
 var serverAction = require('../../mongodb/serverdata')
@@ -197,6 +198,19 @@ module.exports = {
                     }).catch(async err => console.log('写入发文时间失败'))
                 }
 
+                let bodycontent = newResponse.body.toString("utf-8")
+
+                $ = cheerio.load(bodycontent)
+
+                $('#img-content').remove() // 删除正文
+                $('style').remove() // 删除样式
+                $('.rich_media_area_extra').remove() // 删除评论
+                $('link[rel="stylesheet"]').remove() // 删除style加载
+                $('#js_emotion_panel_pc').remove() // 表情
+
+                bodycontent = $.html()
+                // bodycontent = bodycontent.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, '') // 去除img
+
 
                 let nextReadLikeDATA = await serverAction.getReadLikeNext(~~wx)
                 if (nextReadLikeDATA.nothing || nextReadLikeDATA.waiting || nextReadLikeDATA.timeout) { // 如果没数据，<del>或者在等待~</del>(因为在过渡页处理了) 就返回前台页面
@@ -205,9 +219,6 @@ module.exports = {
                     if (nextReadLikeDATA.waiting) action = 'waiting'
                     if (nextReadLikeDATA.timeout) action = 'timeout'
 
-                    let bodycontent = newResponse.body.toString("utf-8")
-
-                    bodycontent = bodycontent.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, '') // 去除img
 
                     // 头部注入js， 防止注入底部不执行（页面其他js报错
                     bodycontent = bodycontent.replace(/(.{0})/, ` 
@@ -227,10 +238,6 @@ module.exports = {
                 } else {
 
                     let nextlink = nextReadLikeDATA['promotion_url'].replace(/amp;/ig, '').replace(/(#rd|#wechat_redirect)/, `&wx=${wx}&order_id=${nextReadLikeDATA.order_id}&unique=${nextReadLikeDATA.unique}&nowtime=${+new Date}&scene=27#wechat_redirect`)
-
-                    let bodycontent = newResponse.body.toString("utf-8")
-
-                    bodycontent = bodycontent.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, '') // 去除img
 
                     // 头部注入js， 防止注入底部不执行（页面其他js报错
                     bodycontent = bodycontent.replace(/(.{0})/, ` 
