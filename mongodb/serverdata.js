@@ -59,7 +59,7 @@ serverAction.getFindAll = async (wx, follow, num = 4) => {
     if (hour >= 18 && hour <= 23) num = 3
 
 
-    let resDATA = await axios.get(`https://s.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}&follow=${follow}`).catch(async err => {
+    let resDATA = await axios.get(`https://s.yundiao365.com/crawler/index/publics?&machine_num=${wx}&limit_num=${num}&follow=${follow}`, timeout: 10000).catch(async err => {
         return await serverAction.recordErrNet(err, 'getFindAll').catch(err => ({
             error: true
         }))
